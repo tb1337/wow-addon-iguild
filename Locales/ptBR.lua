@@ -1,42 +1,4 @@
 local L = LibStub("AceLocale-3.0"):NewLocale("iGuild", "ptBR")
 if not L then return end
 
-L["Available columns"] = "Colunas Dispon\195\173veis" -- Needs review
-L["By Achievement Points"] = "Por pontos de conquista" -- Needs review
-L["By Class"] = "Por Classe" -- Needs review
-L["By Difficulty"] = "Por Dificuldade" -- Needs review
-L["By Guildrank"] = "Por Rank de Guilda" -- Needs review
-L["By Level"] = "Por N\195\173vel" -- Needs review
-L["By Name"] = "Por Nome" -- Needs review
-L["By Threshold"] = "Por limite" -- Needs review
-L["By Zone"] = "Por zona" -- Needs review
-L["Center"] = "Centro" -- Needs review
-L["Change"] = "Change" -- Requires localization
-L["Class"] = "Classe" -- Needs review
-L["Column"] = "Coluna" -- Needs review
-L["Enable Script"] = "Enable Script" -- Requires localization
-L["Enable TradeSkills"] = "Habilitar Profiss\195\181es" -- Needs review
-L["If activated, clicking on the given cell will result in something special."] = "If activated, clicking on the given cell will result in something special." -- Requires localization
-L["iGuild provides some pre-layoutet columns for character names, zones, etc. In order to display them in the tooltip, write their names in the desired order into the beneath input."] = "iGuild prov\195\170 algumas colunas pr\195\169-formatadas para nomes de personagens, zonas, etc. Para disponibiliza-las no quadro de dicas, escreva seus nomes na ordem desejada dentro da entrada abaixo." -- Needs review
-L["Invalid column name!"] = "Nome de coluna invalido!" -- Needs review
-L["Justification"] = "Justifica\195\167\195\163o" -- Needs review
-L["Left"] = "Esquerda" -- Needs review
-L["Level"] = "N\195\173vel" -- Needs review
-L["Name"] = "Nome" -- Needs review
-L["No guild"] = "Sem Guilda" -- Needs review
-L["Note"] = "Nota" -- Needs review
-L["OfficerNote"] = "Nota dos Oficiais" -- Needs review
-L["Points"] = "Pontos" -- Needs review
-L["Querying tradeskills needs extra memory. This is why you explicitly have to enable that. Don't forget to reload your UI!"] = "Arquivar profiss\195\181es requere mem\195\179ria extra. Esse \195\169 o por que voc\195\170 deve habilitar isso. N\195\163o esque\195\167a de reabrir sua UI." -- Needs review
-L["Rank"] = "Rank" -- Needs review
-L["Right"] = "Direita" -- Needs review
-L["Show Guild Level"] = "Mostrar N\195\173vel da Guilda" -- Needs review
-L["Show Guild Name"] = "Mostrar Nome da Guilda" -- Needs review
-L["Show Guild XP"] = "Mostrar XP da Guilda" -- Needs review
-L["Show Label"] = "Mostrar R\195\179tulo" -- Needs review
-L["Sorting"] = "Organiza\195\167\195\163o" -- Needs review
-L["Toggle extra information on the LDB feed."] = "Mostra informa\195\167\195\163o extra na feed dLDB" -- Needs review
-L["TradeSkills"] = "Profiss\195\181es" -- Needs review
-L["Use Icon"] = "Usar \195\141cone" -- Needs review
-L["You are not in a guild."] = "Voc\195\170 n\195\163o est\195\161 em uma Guilda" -- Needs review
-L["Zone"] = "Zona" -- Needs review
+--@localization(locale="ptBR", format="lua_additive_table", handle-unlocalized="english", escape-non-ascii=true, same-key-is-true=true)@
