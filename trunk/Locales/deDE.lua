@@ -1,6 +1,9 @@
 local L = LibStub("AceLocale-3.0"):NewLocale("iGuild", "deDE")
 if not L then return end
 
+--@localization(locale="deDE", format="lua_additive_table", handle-unlocalized="english", escape-non-ascii=true, same-key-is-true=true)@
+
+--@do-not-package@
 L["Available columns"] = "Verf\195\188gbare Spalten"
 L["By Achievement Points"] = "Nach Erfolgspunkten"
 L["By Class"] = "Nach Klasse"
@@ -40,3 +43,4 @@ L["TradeSkills"] = "Berufe"
 L["Use Icon"] = "Icon verwenden"
 L["You are not in a guild."] = "Ihr seid in keiner Gilde."
 L["Zone"] = "Zone"
+--@end-do-not-package@
