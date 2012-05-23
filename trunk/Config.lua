@@ -2,7 +2,7 @@
 -- Get the addon table
 -----------------------------
 
-local AddonName = select(1, ...)
+local AddonName = select(1, ...);
 local iGuild = LibStub("AceAddon-3.0"):GetAddon(AddonName);
 
 local L = LibStub("AceLocale-3.0"):GetLocale(AddonName);
