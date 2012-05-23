@@ -1,10 +1,8 @@
 --
--- iGuild - WoW LDB plugin
--- written by Tobias Schulz (grdn) 2011, EU-Onyxia (Germany)
---
--- It's no rewrite of an existing addon. My mods are completely selfmade.
--- If there are things that could be made better, feel free to contact me.
--- wow-addons@grdn.eu
+-- Author: $Author$
+-- Last updated: $Date$
+-- Revision: $Revision$
+-- Web: $HeadURL$
 --
 
 -----------------------------------
