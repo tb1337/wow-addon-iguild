@@ -1,4 +1,4 @@
-package-as: iGuild-MoP
+package-as: iGuild
 
 externals:
   Libs/CallbackHandler-1.0:
