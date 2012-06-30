@@ -1,4 +1,4 @@
-## Interface: 40300
+## Interface: 50001
 ## Title: i|cffffffaaGuild|r
 ## Version: 1.7.0
 ## Notes: The dynamic Guild Display for your LDB!
