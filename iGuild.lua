@@ -373,14 +373,14 @@ iGuild.Columns = {
 	grouped = {
 		label = _G.GROUP,
 		brush = function(v)
-			if( _G.UnitInParty(v[R_CHAR_NAME]) or _G.UnitInRaid(v[R_CHAR_NAME]) ) then
+			if( _G.UnitInGroup(v[R_CHAR_NAME]) ) then --or _G.UnitInRaid(v[R_CHAR_NAME]) ) then
 				return "|TInterface\\Buttons\\UI-PlusButton-Up:14:14|t";
 			else
 				return "";
 			end
 		end,
 		canUse = function()
-			return _G.GetNumPartyMembers() ~= 0 or _G.GetNumRaidMembers() ~= 0;
+			return _G.GetNumGroupMembers() ~= 0 or _G.GetNumSubgroupMembers() ~= 0;
 		end,
 	}
 };
@@ -418,7 +418,7 @@ function iGuild:OnInitialize()
 	self:RegisterEvent("GUILD_MOTD", "RosterUpdate");
 	self:RegisterEvent("PLAYER_GUILD_UPDATE", "RosterUpdate");
 	self:RegisterEvent("PLAYER_ENTERING_WORLD", "EnterWorld");
-	self:RegisterEvent("PARTY_MEMBERS_CHANGED", "PartyChanged");
+	self:RegisterEvent("GROUP_MEMBERS_CHANGED", "GroupChanged");
 end
 
 function iGuild:EnterWorld()
@@ -439,10 +439,10 @@ function iGuild:EnterWorld()
 end
 
 ----------------------
--- PartyChanged
+-- GroupChanged
 ----------------------
 
-function iGuild:PartyChanged()
+function iGuild:GroupChanged()
 	self:GetDisplayedColumns();
 	if( LibQTip:IsAcquired("iSuite"..AddonName) ) then
 		self:UpdateTooltip();
