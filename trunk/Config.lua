@@ -476,7 +476,7 @@ local function CreateConfig()
 			},
 			Column_exp = {
 				type = "group",
-				name = XP,
+				name = _G.XP,
 				order = 20,
 				args = {
 					ShowLabel = {
@@ -583,7 +583,7 @@ function iGuild:CreateDB()
 			},
 			acmpoints = {
 				ShowLabel = true,
-				Align = "CENTER",
+				Align = "LEFT",
 				Color = 1,
 			},
 			tradeskills = {
@@ -593,7 +593,7 @@ function iGuild:CreateDB()
 				EnableScript = true,
 			},
 			class = {
-				ShowLabel = true,
+				ShowLabel = false,
 				Align = "LEFT",
 				Icon = true,
 				Color = 2,

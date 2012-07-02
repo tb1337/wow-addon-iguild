@@ -290,12 +290,14 @@ iGuild.Columns = {
 	acmpoints = {
 		label = L["Points"],
 		brush = function(v)
+			local displayPoints = _G.BreakUpLargeNumbers(v[R_ACM_POINTS]);
+			
 			-- encolor by threshold
 			if( iGuild.db.Column.acmpoints.Color == 2 ) then
-				return ("|cff%s%s|r"):format(LibCrayon:GetThresholdHexColor(v[R_ACM_POINTS], MAX_ACMPOINTS), v[R_ACM_POINTS]);
+				return ("|cff%s%s|r"):format(LibCrayon:GetThresholdHexColor(v[R_ACM_POINTS], MAX_ACMPOINTS), displayPoints);
 			-- no color
 			else
-				return (COLOR_GOLD):format(v[R_ACM_POINTS]);
+				return (COLOR_GOLD):format(displayPoints);
 			end
 		end,
 	},
@@ -358,9 +360,11 @@ iGuild.Columns = {
 		end,
 	},
 	exp = {
-		label = XP,
-		brush = function(v)
-			return (COLOR_GOLD):format(v[R_XP_MAX] /1000);
+		label = _G.XP,
+		brush = function(v)			
+			return (COLOR_GOLD):format(
+				_G.BreakUpLargeNumbers(math.ceil(v[R_XP_MAX] / 1000))
+			);
 		end,
 	},
 	grouped = {
@@ -454,22 +458,24 @@ function iGuild:RosterUpdate(event)
 		
 		local total, totalOn = _G.GetNumGuildMembers();
 		local feedText = ("%d/%d"):format(totalOn, total);
-		local level, guild = _G.GetGuildLevel(), _G.GetGuildInfo("player");
+		
+		local guildLevel, maxLevel = _G.GetGuildLevel();
+		local guildName = _G.GetGuildInfo("player");
 		
 		-- check if guildname is to be shown on the feed
-		if( self.db.ShowGuildName and guild ) then
-			feedText = (COLOR_GOLD.." %s"):format(guild, feedText);
+		if( self.db.ShowGuildName and guildName ) then
+			feedText = (COLOR_GOLD.." %s"):format(guildName, feedText);
 		end
 		
 		-- check if guildlevel is to be shown on the feed
 		if( self.db.ShowGuildLevel ) then
-			feedText = ("%s "..COLOR_GOLD.."%d"):format(feedText, "| ", level);
+			feedText = ("%s "..COLOR_GOLD.."%d"):format(feedText, "| ", guildLevel);
 		end
 		
 		-- check if guild XP is to be shown on the feed
 		if( self.db.ShowGuildXP ) then
 			local currXP, nextUp = _G.UnitGetGuildXP("player");
-			feedText = ("%s (%d%%)"):format(feedText, level < _G.MAX_GUILD_LEVEL and math.ceil(currXP / (currXP + nextUp) * 100) or 100);
+			feedText = ("%s (%d%%)"):format(feedText, guildLevel < maxLevel and math.ceil(currXP / (currXP + nextUp) * 100) or 100);
 		end
 		
 		self.Feed.text = feedText;		
