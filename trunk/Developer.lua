@@ -12,6 +12,8 @@ local iGuild = LibStub("AceAddon-3.0"):GetAddon(AddonName);
 -- Cataclysm
 -- Patch 4.3.4 = 15250
 
+----------------------------
+
 -- Mists of Pandaria
 -- Patch 5.0.1 = 19540
 

@@ -57,18 +57,18 @@ local function CreateConfig()
 				type = "description",
 				name = L["iGuild provides some pre-layoutet columns for character names, zones, etc. In order to display them in the tooltip, write their names in the desired order into the beneath input."].."\n",
 				fontSize = "medium",
-				order = 1,
+				order = 10,
 			},
 			Infotext2 = {
 				type = "description",
 				name = "",
 				fontSize = "medium",
-				order = 2,
+				order = 20,
 			},
 			Display = {
 				type = "input",
 				name = "",
-				order = 3,
+				order = 30,
 				width = "full",
 				validate = function(info, value)
 					local list = strsplit(",%s*", value);
@@ -91,7 +91,7 @@ local function CreateConfig()
 			Sorting = {
 				type = "select",
 				name = L["Sorting"],
-				order = 4,
+				order = 40,
 				values = {
 					["name"] = L["By Name"],
 					["level"] = L["By Level"],
@@ -107,19 +107,19 @@ local function CreateConfig()
 				type = "description",
 				name = "\n"..L["Toggle extra information on the LDB feed."],
 				fontSize = "medium",
-				order = 5,
+				order = 50,
 			},
 			ShowGuildName = {
 				type = "toggle",
 				name = L["Show Guild Name"],
-				order = 6,
+				order = 60,
 				get = function() return iGuild.db.ShowGuildName end,
 				set = function(info, value) iGuild.db.ShowGuildName = value end,
 			},
 			ShowGuildMOTD = {
 				type = "toggle",
 				name = _G.GUILD_MOTD,
-				order = 7,
+				order = 70,
 				width = "double",
 				get = function() return iGuild.db.ShowGuildMOTD end,
 				set = function(info, value) iGuild.db.ShowGuildMOTD = value end,
@@ -127,37 +127,73 @@ local function CreateConfig()
 			ShowGuildLevel = {
 				type = "toggle",
 				name = L["Show Guild Level"],
-				order = 8,
+				order = 80,
 				get = function() return iGuild.db.ShowGuildLevel end,
 				set = function(info, value) iGuild.db.ShowGuildLevel = value end,
 			},
 			ShowGuildXP = {
 				type = "toggle",
 				name = L["Show Guild XP"],
-				order = 9,
+				order = 90,
 				get = function() return iGuild.db.ShowGuildXP end,
 				set = function(info, value) iGuild.db.ShowGuildXP = value end,
 			},
 			Spacer2 = {
 				type = "description",
 				name = " ",
-				order = 10,
+				order = 100,
+			},
+			Column_grouped = {
+				type = "group",
+				name = _G.GROUP,
+				order = 110,
+				args = {
+					Infotext = {
+						type = "description",
+						name = L["Displays the following green icon when you are grouped with guild mates:"].." |TInterface\\RAIDFRAME\\ReadyCheck-Ready:14:14|t\n",
+						order = 1,
+						fontSize = "medium",
+					},
+					ShowLabel = {
+						type = "toggle",
+						name = L["Show Label"],
+						order = 5,
+						arg = {k = "grouped", v = "ShowLabel"},
+					},
+					Justification = {
+						type = "select",
+						name = L["Justification"],
+						order = 10,
+						values = {
+							["LEFT"] = L["Left"],
+							["CENTER"] = L["Center"],
+							["RIGHT"] = L["Right"],
+						},
+						arg = {k = "grouped", v = "Align"},
+					},
+				},
 			},
 			Column_level = {
 				type = "group",
 				name = L["Level"],
-				order = 11,
+				order = 120,
 				args = {
+					Infotext = {
+						type = "description",
+						name = L["Displays the level of your guild mates."].."\n",
+						order = 1,
+						fontSize = "medium",
+					},
 					ShowLabel = {
 						type = "toggle",
 						name = L["Show Label"],
-						order = 1,
+						order = 5,
 						arg = {k = "level", v = "ShowLabel"},
 					},
 					Justification = {
 						type = "select",
 						name = L["Justification"],
-						order = 2,
+						order = 10,
 						values = {
 							["LEFT"] = L["Left"],
 							["CENTER"] = L["Center"],
@@ -168,7 +204,7 @@ local function CreateConfig()
 					ColorOption = {
 						type = "select",
 						name = COLOR,
-						order = 3,
+						order = 15,
 						values = {
 							[1] = _G.NONE,
 							[2] = L["By Difficulty"],
@@ -178,21 +214,73 @@ local function CreateConfig()
 					},
 				},
 			},
-			Column_name = {
+			Column_class = {
 				type = "group",
-				name = L["Name"],
-				order = 12,
+				name = L["Class"],
+				order = 130,
 				args = {
+					Infotext = {
+						type = "description",
+						name = L["Displays the class of your guild mates. Choose whether to show the class name or the class icon."].."\n",
+						order = 1,
+						fontSize = "medium",
+					},
 					ShowLabel = {
 						type = "toggle",
 						name = L["Show Label"],
+						order = 5,
+						arg = {k = "class", v = "ShowLabel"},
+					},
+					Justification = {
+						type = "select",
+						name = L["Justification"],
+						order = 10,
+						values = {
+							["LEFT"] = L["Left"],
+							["CENTER"] = L["Center"],
+							["RIGHT"] = L["Right"],
+						},
+						arg = {k = "class", v = "Align"},
+					},
+					UseIcon = {
+						type = "toggle",
+						name = L["Use Icon"],
+						order = 15,
+						arg = {k = "class", v = "Icon"},
+					},
+					ColorOption = {
+						type = "select",
+						name = _G.COLOR,
+						order = 20,
+						values = {
+							[1] = _G.NONE,
+							[2] = L["By Class"],
+						},
+						arg = {k = "class", v = "Color"},
+					},
+				},
+			},
+			Column_name = {
+				type = "group",
+				name = L["Name"],
+				order = 140,
+				args = {
+					Infotext = {
+						type = "description",
+						name = L["Displays the name of your guild mates. In addition, a short info is shown if they are AFK or DND."].."\n",
 						order = 1,
+						fontSize = "medium",
+					},
+					ShowLabel = {
+						type = "toggle",
+						name = L["Show Label"],
+						order = 5,
 						arg = {k = "name", v = "ShowLabel"},
 					},
 					Justification = {
 						type = "select",
 						name = L["Justification"],
-						order = 2,
+						order = 10,
 						values = {
 							["LEFT"] = L["Left"],
 							["CENTER"] = L["Center"],
@@ -203,7 +291,7 @@ local function CreateConfig()
 					ColorOption = {
 						type = "select",
 						name = _G.COLOR,
-						order = 3,
+						order = 15,
 						values = {
 							[1] = _G.NONE,
 							[2] = L["By Class"],
@@ -215,18 +303,24 @@ local function CreateConfig()
 			Column_zone = {
 				type = "group",
 				name = L["Zone"],
-				order = 13,
+				order = 150,
 				args = {
+					Infotext = {
+						type = "description",
+						name = L["Displays the zone of your guild mates."].."\n",
+						order = 1,
+						fontSize = "medium",
+					},
 					ShowLabel = {
 						type = "toggle",
 						name = L["Show Label"],
-						order = 1,
+						order = 5,
 						arg = {k = "zone", v = "ShowLabel"},
 					},
 					Justification = {
 						type = "select",
 						name = L["Justification"],
-						order = 2,
+						order = 10,
 						values = {
 							["LEFT"] = L["Left"],
 							["CENTER"] = L["Center"],
@@ -236,28 +330,85 @@ local function CreateConfig()
 					},
 				},
 			},
-			Column_rank = {
+			Column_tradeskills = {
 				type = "group",
-				name = L["Rank"],
-				order = 13,
+				name = L["TradeSkills"],
+				order = 160,
 				args = {
+					Infotext = {
+						type = "description",
+						name = L["Displays the tradeskills of your guild mates as little icons. Be sure to activate the red option if you want to use it."].."\n",
+						order = 1,
+						fontSize = "medium",
+					},
 					ShowLabel = {
 						type = "toggle",
 						name = L["Show Label"],
+						order = 5,
+						arg = {k = "tradeskills", v = "ShowLabel"},
+					},
+					Justification = {
+						type = "select",
+						name = L["Justification"],
+						order = 10,
+						values = {
+							["LEFT"] = L["Left"],
+							["CENTER"] = L["Center"],
+							["RIGHT"] = L["Right"],
+						},
+						arg = {k = "tradeskills", v = "Align"},
+					},
+					EnableScript = {
+						type = "toggle",
+						name = L["Enable Script"],
+						desc = L["If activated, clicking on the given cell will result in something special."],
+						order = 15,
+						width = "full",
+						arg = {k = "tradeskills", v = "EnableScript"},
+					},
+					EnableOption = {
+						type = "toggle",
+						name = "|cffff0000"..L["Enable TradeSkills"].."|r",
+						width = "full",
+						order = 20,
+						arg = {k = "tradeskills", v = "Enable"},
+					},
+					Infotext1 = {
+						type = "description",
+						name = "|cffff0000"..L["Querying tradeskills needs extra memory. This is why you explicitly have to enable that. Don't forget to reload your UI!"].."\n",
+						fontSize = "medium",
+						order = 25,
+					},
+				},
+			},
+			Column_rank = {
+				type = "group",
+				name = L["Rank"],
+				order = 170,
+				args = {
+					Infotext = {
+						type = "description",
+						name = L["Displays the guild rank of your guild mates."].."\n",
 						order = 1,
+						fontSize = "medium",
+					},
+					ShowLabel = {
+						type = "toggle",
+						name = L["Show Label"],
+						order = 5,
 						arg = {k = "rank",v = "ShowLabel"},
 					},
 					EnableScript = {
 						type = "toggle",
 						name = L["Enable Script"],
 						desc = L["If activated, clicking on the given cell will result in something special."],
-						order = 2,
+						order = 10,
 						arg = {k = "rank", v = "EnableScript"},
 					},
 					Justification = {
 						type = "select",
 						name = L["Justification"],
-						order = 3,
+						order = 15,
 						values = {
 							["LEFT"] = L["Left"],
 							["CENTER"] = L["Center"],
@@ -269,12 +420,12 @@ local function CreateConfig()
 						type = "description",
 						name = "",
 						width = "full",
-						order = 4,
+						order = 20,
 					},
 					ColorOption = {
 						type = "select",
 						name = _G.COLOR,
-						order = 5,
+						order = 25,
 						values = {
 							[1] = _G.NONE,
 							[2] = L["By Threshold"],
@@ -286,18 +437,24 @@ local function CreateConfig()
 			Column_note = {
 				type = "group",
 				name = L["Note"],
-				order = 14,
+				order = 180,
 				args = {
+					Infotext = {
+						type = "description",
+						name = L["Displays the public note of your guild mates."].."\n",
+						order = 1,
+						fontSize = "medium",
+					},
 					ShowLabel = {
 						type = "toggle",
 						name = L["Show Label"],
-						order = 1,
+						order = 5,
 						arg = {k = "note", v = "ShowLabel"},
 					},
 					Justification = {
 						type = "select",
 						name = L["Justification"],
-						order = 2,
+						order = 10,
 						values = {
 							["LEFT"] = L["Left"],
 							["CENTER"] = L["Center"],
@@ -310,18 +467,24 @@ local function CreateConfig()
 			Column_officernote = {
 				type = "group",
 				name = L["OfficerNote"],
-				order = 15,
+				order = 190,
 				args = {
+					Infotext = {
+						type = "description",
+						name = L["Displays the officer note of your guild mates, if you can see it. The whole column is not shown otherwise."].."\n",
+						order = 1,
+						fontSize = "medium",
+					},
 					ShowLabel = {
 						type = "toggle",
 						name = L["Show Label"],
-						order = 1,
+						order = 5,
 						arg = {k = "officernote", v = "ShowLabel"},
 					},
 					Justification = {
 						type = "select",
 						name = L["Justification"],
-						order = 2,
+						order = 10,
 						values = {
 							["LEFT"] = L["Left"],
 							["CENTER"] = L["Center"],
@@ -334,18 +497,24 @@ local function CreateConfig()
 			Column_notecombi = {
 				type = "group",
 				name = L["Note"].."**",
-				order = 16,
+				order = 200,
 				args = {
+					Infotext = {
+						type = "description",
+						name = L["Displays both public and officer notes of your guild mates in a single column."].."\n",
+						order = 1,
+						fontSize = "medium",
+					},
 					ShowLabel = {
 						type = "toggle",
 						name = L["Show Label"],
-						order = 1,
+						order = 5,
 						arg = {k = "notecombi", v = "ShowLabel"},
 					},
 					Justification = {
 						type = "select",
 						name = L["Justification"],
-						order = 2,
+						order = 10,
 						values = {
 							["LEFT"] = L["Left"],
 							["CENTER"] = L["Center"],
@@ -358,18 +527,24 @@ local function CreateConfig()
 			Column_acmpoints = {
 				type = "group",
 				name = L["Points"],
-				order = 17,
+				order = 210,
 				args = {
+					Infotext = {
+						type = "description",
+						name = L["Displays the achievement points of your guild mates."].."\n",
+						order = 1,
+						fontSize = "medium",
+					},
 					ShowLabel = {
 						type = "toggle",
 						name = L["Show Label"],
-						order = 1,
+						order = 5,
 						arg = {k = "acmpoints", v = "ShowLabel"},
 					},
 					Justification = {
 						type = "select",
 						name = L["Justification"],
-						order = 2,
+						order = 10,
 						values = {
 							["LEFT"] = L["Left"],
 							["CENTER"] = L["Center"],
@@ -380,7 +555,7 @@ local function CreateConfig()
 					ColorOption = {
 						type = "select",
 						name = _G.COLOR,
-						order = 3,
+						order = 15,
 						values = {
 							[1] = _G.NONE,
 							[2] = L["By Threshold"],
@@ -389,136 +564,33 @@ local function CreateConfig()
 					},
 				},
 			},
-			Column_tradeskills = {
-				type = "group",
-				name = L["TradeSkills"],
-				order = 18,
-				args = {
-					ShowLabel = {
-						type = "toggle",
-						name = L["Show Label"],
-						order = 1,
-						arg = {k = "tradeskills", v = "ShowLabel"},
-					},
-					Justification = {
-						type = "select",
-						name = L["Justification"],
-						order = 2,
-						values = {
-							["LEFT"] = L["Left"],
-							["CENTER"] = L["Center"],
-							["RIGHT"] = L["Right"],
-						},
-						arg = {k = "tradeskills", v = "Align"},
-					},
-					EnableScript = {
-						type = "toggle",
-						name = L["Enable Script"],
-						desc = L["If activated, clicking on the given cell will result in something special."],
-						order = 3,
-						width = "full",
-						arg = {k = "tradeskills", v = "EnableScript"},
-					},
-					EnableOption = {
-						type = "toggle",
-						name = "|cffff0000"..L["Enable TradeSkills"].."|r",
-						width = "full",
-						order = 4,
-						arg = {k = "tradeskills", v = "Enable"},
-					},
-					Infotext1 = {
-						type = "description",
-						name = "|cffff0000"..L["Querying tradeskills needs extra memory. This is why you explicitly have to enable that. Don't forget to reload your UI!"].."\n",
-						fontSize = "medium",
-						order = 5,
-					},
-				},
-			},
-			Column_class = {
-				type = "group",
-				name = L["Class"],
-				order = 19,
-				args = {
-					ShowLabel = {
-						type = "toggle",
-						name = L["Show Label"],
-						order = 1,
-						arg = {k = "class", v = "ShowLabel"},
-					},
-					Justification = {
-						type = "select",
-						name = L["Justification"],
-						order = 2,
-						values = {
-							["LEFT"] = L["Left"],
-							["CENTER"] = L["Center"],
-							["RIGHT"] = L["Right"],
-						},
-						arg = {k = "class", v = "Align"},
-					},
-					UseIcon = {
-						type = "toggle",
-						name = L["Use Icon"],
-						order = 3,
-						arg = {k = "class", v = "Icon"},
-					},
-					ColorOption = {
-						type = "select",
-						name = _G.COLOR,
-						order = 4,
-						values = {
-							[1] = _G.NONE,
-							[2] = L["By Class"],
-						},
-						arg = {k = "class", v = "Color"},
-					},
-				},
-			},
 			Column_exp = {
 				type = "group",
 				name = _G.XP,
-				order = 20,
+				order = 220,
 				args = {
+					Infotext = {
+						type = "description",
+						name = L["Displays the guild exp contributed by your guild mates. The displayed number is divided by 1000."].."\n",
+						order = 1,
+						fontSize = "medium",
+					},
 					ShowLabel = {
 						type = "toggle",
 						name = L["Show Label"],
-						order = 1,
+						order = 5,
 						arg = {k = "exp", v = "ShowLabel"},
 					},
 					Justification = {
 						type = "select",
 						name = L["Justification"],
-						order = 2,
+						order = 10,
 						values = {
 							["LEFT"] = L["Left"],
 							["CENTER"] = L["Center"],
 							["RIGHT"] = L["Right"],
 						},
 						arg = {k = "exp", v = "Align"},
-					},
-				},
-			},
-			Column_grouped = {
-				type = "group",
-				name = _G.GROUP,
-				order = 21,
-				args = {
-					ShowLabel = {
-						type = "toggle",
-						name = L["Show Label"],
-						order = 1,
-						arg = {k = "grouped", v = "ShowLabel"},
-					},
-					Justification = {
-						type = "select",
-						name = L["Justification"],
-						order = 2,
-						values = {
-							["LEFT"] = L["Left"],
-							["CENTER"] = L["Center"],
-							["RIGHT"] = L["Right"],
-						},
-						arg = {k = "grouped", v = "Align"},
 					},
 				},
 			},
@@ -529,6 +601,7 @@ local function CreateConfig()
 	for k, _ in pairs(iGuild.Columns) do
 		table.insert(colnames, k);
 	end
+	table.sort(colnames, function(a, b) return a < b end);
 	
 	db.args.Infotext2.name = ("%s: |cfffed100%s|r\n"):format(
 		L["Available columns"],
