@@ -21,7 +21,7 @@ local format = string.format;
 local Tooltip; -- our tooltip
 local RosterTimer; -- timer when the roster is fetched again
 
-local MAX_ACMPOINTS = 15240; -- I use the handy app to get this, tricky business.
+local MAX_ACMPOINTS = 19540; -- see iGuild/Developer.lua
 
 local COLOR_GOLD = "|cfffed100%s|r";
 local COLOR_MASTER  = "|cffff6644%s|r";
@@ -89,6 +89,10 @@ iGuild.Feed.OnClick = function(_, button)
 		end
 	elseif( button == "RightButton" ) then
 		iGuild:OpenOptions();
+--@do-not-package@
+	elseif( button == "MiddleButton" ) then
+		iGuild:CountAchievements();	
+--@end-do-not-package@
 	end
 end
 

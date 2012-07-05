@@ -29,3 +29,7 @@ Locales\Locales.xml
 # Main
 iGuild.lua
 Config.lua
+
+#@do-not-package@
+Developer.lua
+#@end-do-not-package@
