@@ -4,6 +4,19 @@ local L = LibStub("AceLocale-3.0"):NewLocale(AddonName, "enUS", true)
 --@localization(locale="enUS", format="lua_additive_table", handle-unlocalized="english", escape-non-ascii=true, same-key-is-true=true)@
 
 --@do-not-package@
+L["Displays the following green icon when you are grouped with guild mates:"] = true
+L["Displays the level of your guild mates."] = true
+L["Displays the class of your guild mates. Choose whether to show the class name or the class icon."] = true
+L["Displays the name of your guild mates. In addition, a short info is shown if they are AFK or DND."] = true
+L["Displays the zone of your guild mates."] = true
+L["Displays the tradeskills of your guild mates as little icons. Be sure to activate the red option if you want to use it."] = true
+L["Displays the guild rank of your guild mates."] = true
+L["Displays the public note of your guild mates."] = true
+L["Displays the officer note of your guild mates, if you can see it. The whole column is not shown otherwise."] = true
+L["Displays both public and officer notes of your guild mates in a single column."] = true
+L["Displays the achievement points of your guild mates."] = true
+L["Displays the guild exp contributed by your guild mates. The displayed number is divided by 1000."] = true
+
 L["Available columns"] = "Available columns"
 L["By Achievement Points"] = "By Achievement Points"
 L["By Class"] = "By Class"
