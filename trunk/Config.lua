@@ -147,7 +147,6 @@ cfg = {
 				get = function() return iGuild.db.ShowGuildName end,
 				set = function(info, value) iGuild.db.ShowGuildName = value end,
 			},
-			
 			ShowGuildLevel = {
 				type = "toggle",
 				name = L["Show Guild Level"],
@@ -690,7 +689,7 @@ cfg = {
 				},
 			},
 		},
-	};
+};
 show_colored_columns();
 
 function iGuild:OpenOptions()
