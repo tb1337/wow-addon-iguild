@@ -7,42 +7,124 @@ local iGuild = LibStub("AceAddon-3.0"):GetAddon(AddonName);
 
 local L = LibStub("AceLocale-3.0"):GetLocale(AddonName);
 
+local _G = _G; -- I always use _G.FUNC when I call a Global. Upvalueing done here.
+local format = string.format;
+
+-----------------------------------------
+-- Variables, functions and colors
+-----------------------------------------
+
+local cfg; -- this stores our configuration GUI
+
+local COLOR_RED  = "|cffff0000%s|r";
+local COLOR_GREEN= "|cff00ff00%s|r";
+
 ---------------------------
--- Utility functions
+-- The options table
 ---------------------------
 
--- a better strsplit function :)
-local function strsplit(delimiter, text)
-  local list = {}
-  local pos = 1
-  if strfind("", delimiter, 1) then -- this would result in endless loops
-    --error("delimiter matches empty string!")
-  end
-  while 1 do
-    local first, last = strfind(text, delimiter, pos)
-    if first then -- found?
-      tinsert(list, strsub(text, pos, first-1))
-      pos = last+1
-    else
-      tinsert(list, strsub(text, pos))
-      break
-    end
-  end
-  return list
+function iGuild:CreateDB()
+	iGuild.CreateDB = nil;
+	
+	return { profile = {
+		Display = "grouped, level, class, name, zone, rank",
+		Sort = "name",
+		ShowGuildName = false,
+		ShowGuildMOTD = false,
+		ShowGuildLevel = false,
+		ShowGuildXP = false,
+		Column = {
+			level = {
+				ShowLabel = false,
+				Align = "RIGHT",
+				Color = 2,
+			},
+			name = {
+				ShowLabel = true,
+				Align = "LEFT",
+				Color = 2,
+			},
+			zone = {
+				ShowLabel = true,
+				Align = "CENTER",
+			},
+			rank = {
+				ShowLabel = true,
+				Align = "LEFT",
+				Color = 1,
+				EnableScript = true,
+			},
+			note = {
+				ShowLabel = true,
+				Align = "LEFT",
+			},
+			officernote = {
+				ShowLabel = true,
+				Align = "LEFT",
+			},
+			notecombi = {
+				ShowLabel = true,
+				Align = "LEFT",
+			},
+			acmpoints = {
+				ShowLabel = true,
+				Align = "LEFT",
+				Color = 1,
+			},
+			tradeskills = {
+				ShowLabel = false,
+				Align = "CENTER",
+				Enable = false,
+				EnableScript = true,
+			},
+			class = {
+				ShowLabel = false,
+				Align = "LEFT",
+				Icon = true,
+				Color = 2,
+			},
+			exp = {
+				ShowLabel = true,
+				Align = "LEFT",
+			},
+			grouped = {
+				ShowLabel = false,
+				Align = "RIGHT",
+			},
+		},
+	}};
 end
 
 ---------------------------------
 -- The configuration table
 ---------------------------------
 
-function iGuild:GetConfigColumns()
-	self.ConfigColumns = strsplit(",%s*", self.db.Display);
+local function sort_colored_columns(a, b) return a < b end
+local function show_colored_columns()
+	local cols = {};
+	
+	for k, _ in pairs(iGuild.Columns) do
+		table.insert(cols, (_G.tContains(iGuild.DisplayedColumns, k) and COLOR_GREEN or COLOR_RED):format(k) );
+	end
+	table.sort(cols, sort_colored_columns);
+	
+	cfg.args.Infotext2.name = ("%s: |cfffed100%s|r\n"):format(
+		L["Available columns"],
+		table.concat(cols, ", ")
+	);
+	
+	local clean, prefix, suffix;
+	for i, v in ipairs(cols) do
+		clean  = v:sub(11,-3); -- **
+		prefix = v:sub(1, 10); -- since I formatted the string to spare out another table, we need some CPU here. :-P
+		suffix = v:sub(-3, 0); -- **
+		cfg.args["Column_"..clean].name = prefix..iGuild.Columns[clean].label..suffix;
+	end
 end
+-- for usage once
+iGuild.show_colored_columns = show_colored_columns;
 
-local function CreateConfig()
-	CreateConfig = nil; -- we just need this function once, thus removing it from memory.
-
-	local db = {
+cfg = {
 		type = "group",
 		name = AddonName,
 		order = 1,
@@ -53,30 +135,70 @@ local function CreateConfig()
 			iGuild.db.Column[info.arg.k][info.arg.v] = value;
 		end,
 		args = {
+			Header1 = {
+				type = "header",
+				name = "Feed Options",
+				order = 2,
+			},
+			ShowGuildName = {
+				type = "toggle",
+				name = L["Show Guild Name"],
+				order = 5,
+				get = function() return iGuild.db.ShowGuildName end,
+				set = function(info, value) iGuild.db.ShowGuildName = value end,
+			},
+			
+			ShowGuildLevel = {
+				type = "toggle",
+				name = L["Show Guild Level"],
+				order = 10,
+				get = function() return iGuild.db.ShowGuildLevel end,
+				set = function(info, value) iGuild.db.ShowGuildLevel = value end,
+			},
+			ShowGuildXP = {
+				type = "toggle",
+				name = L["Show Guild XP"],
+				order = 15,
+				get = function() return iGuild.db.ShowGuildXP end,
+				set = function(info, value) iGuild.db.ShowGuildXP = value end,
+			},
+			Spacer2 = {
+				type = "description",
+				name = " ",
+				fontSize = "small",
+				order = 20,
+			},
+			Header2 = {
+				type = "header",
+				name = "Tooltip Options",
+				order = 30,
+			},
 			Infotext1 = {
 				type = "description",
 				name = L["iGuild provides some pre-layoutet columns for character names, zones, etc. In order to display them in the tooltip, write their names in the desired order into the beneath input."].."\n",
 				fontSize = "medium",
-				order = 10,
+				order = 40,
 			},
 			Infotext2 = {
 				type = "description",
 				name = "",
-				fontSize = "medium",
-				order = 20,
+				fontSize = "small",
+				order = 50,
 			},
 			Display = {
 				type = "input",
 				name = "",
-				order = 30,
+				order = 60,
 				width = "full",
 				validate = function(info, value)
-					local list = strsplit(",%s*", value);
-					for i = 1, #list do
-						if( not iGuild.Columns[list[i]] ) then
+					local list = {strsplit(",", value)};
+					
+					for i, v in ipairs(list) do
+						if( not iGuild.Columns[strtrim(v)] ) then
 							return L["Invalid column name!"];
 						end
 					end
+					
 					return true;
 				end,
 				get = function(info)
@@ -84,14 +206,22 @@ local function CreateConfig()
 				end,
 				set = function(info, value)
 					iGuild.db.Display = value;
-					iGuild:GetConfigColumns();
 					iGuild:GetDisplayedColumns();
+					show_colored_columns();
 				end,
+			},
+			ShowGuildMOTD = {
+				type = "toggle",
+				name = _G.GUILD_MOTD,
+				order = 80,
+				width = "double",
+				get = function() return iGuild.db.ShowGuildMOTD end,
+				set = function(info, value) iGuild.db.ShowGuildMOTD = value end,
 			},
 			Sorting = {
 				type = "select",
 				name = L["Sorting"],
-				order = 40,
+				order = 90,
 				values = {
 					["name"] = L["By Name"],
 					["level"] = L["By Level"],
@@ -102,50 +232,15 @@ local function CreateConfig()
 				},
 				get = function() return iGuild.db.Sort end,
 				set = function(info, value) iGuild.db.Sort = value end,
-			},
-			Infotext3 = {
-				type = "description",
-				name = "\n"..L["Toggle extra information on the LDB feed."],
-				fontSize = "medium",
-				order = 50,
-			},
-			ShowGuildName = {
-				type = "toggle",
-				name = L["Show Guild Name"],
-				order = 60,
-				get = function() return iGuild.db.ShowGuildName end,
-				set = function(info, value) iGuild.db.ShowGuildName = value end,
-			},
-			ShowGuildMOTD = {
-				type = "toggle",
-				name = _G.GUILD_MOTD,
-				order = 70,
-				width = "double",
-				get = function() return iGuild.db.ShowGuildMOTD end,
-				set = function(info, value) iGuild.db.ShowGuildMOTD = value end,
-			},
-			ShowGuildLevel = {
-				type = "toggle",
-				name = L["Show Guild Level"],
-				order = 80,
-				get = function() return iGuild.db.ShowGuildLevel end,
-				set = function(info, value) iGuild.db.ShowGuildLevel = value end,
-			},
-			ShowGuildXP = {
-				type = "toggle",
-				name = L["Show Guild XP"],
-				order = 90,
-				get = function() return iGuild.db.ShowGuildXP end,
-				set = function(info, value) iGuild.db.ShowGuildXP = value end,
-			},
-			Spacer2 = {
+			},			
+			Spacer3 = {
 				type = "description",
 				name = " ",
 				order = 100,
 			},
 			Column_grouped = {
 				type = "group",
-				name = _G.GROUP,
+				name = "",
 				order = 110,
 				args = {
 					Infotext = {
@@ -175,7 +270,7 @@ local function CreateConfig()
 			},
 			Column_level = {
 				type = "group",
-				name = L["Level"],
+				name = "",
 				order = 120,
 				args = {
 					Infotext = {
@@ -216,7 +311,7 @@ local function CreateConfig()
 			},
 			Column_class = {
 				type = "group",
-				name = L["Class"],
+				name = "",
 				order = 130,
 				args = {
 					Infotext = {
@@ -262,7 +357,7 @@ local function CreateConfig()
 			},
 			Column_name = {
 				type = "group",
-				name = L["Name"],
+				name = "",
 				order = 140,
 				args = {
 					Infotext = {
@@ -302,7 +397,7 @@ local function CreateConfig()
 			},
 			Column_zone = {
 				type = "group",
-				name = L["Zone"],
+				name = "",
 				order = 150,
 				args = {
 					Infotext = {
@@ -332,7 +427,7 @@ local function CreateConfig()
 			},
 			Column_tradeskills = {
 				type = "group",
-				name = L["TradeSkills"],
+				name = "",
 				order = 160,
 				args = {
 					Infotext = {
@@ -383,7 +478,7 @@ local function CreateConfig()
 			},
 			Column_rank = {
 				type = "group",
-				name = L["Rank"],
+				name = "",
 				order = 170,
 				args = {
 					Infotext = {
@@ -436,7 +531,7 @@ local function CreateConfig()
 			},
 			Column_note = {
 				type = "group",
-				name = L["Note"],
+				name = "",
 				order = 180,
 				args = {
 					Infotext = {
@@ -466,7 +561,7 @@ local function CreateConfig()
 			},
 			Column_officernote = {
 				type = "group",
-				name = L["OfficerNote"],
+				name = "",
 				order = 190,
 				args = {
 					Infotext = {
@@ -496,7 +591,7 @@ local function CreateConfig()
 			},
 			Column_notecombi = {
 				type = "group",
-				name = L["Note"].."**",
+				name = "",
 				order = 200,
 				args = {
 					Infotext = {
@@ -526,7 +621,7 @@ local function CreateConfig()
 			},
 			Column_acmpoints = {
 				type = "group",
-				name = L["Points"],
+				name = "",
 				order = 210,
 				args = {
 					Infotext = {
@@ -566,7 +661,7 @@ local function CreateConfig()
 			},
 			Column_exp = {
 				type = "group",
-				name = _G.XP,
+				name = "",
 				order = 220,
 				args = {
 					Infotext = {
@@ -596,98 +691,13 @@ local function CreateConfig()
 			},
 		},
 	};
-	
-	local colnames = {};
-	for k, _ in pairs(iGuild.Columns) do
-		table.insert(colnames, k);
-	end
-	table.sort(colnames, function(a, b) return a < b end);
-	
-	db.args.Infotext2.name = ("%s: |cfffed100%s|r\n"):format(
-		L["Available columns"],
-		table.concat(colnames, ", ")
-	);
-	
-	return db;
-end
-
-function iGuild:CreateDB()
-	iGuild.CreateDB = nil;
-	
-	return { profile = {
-		Display = "grouped, level, class, name, zone, rank",
-		Sort = "name",
-		ShowGuildName = false,
-		ShowGuildMOTD = false,
-		ShowGuildLevel = false,
-		ShowGuildXP = false,
-		Column = {
-			level = {
-				ShowLabel = false,
-				Align = "RIGHT",
-				Color = 2,
-			},
-			name = {
-				ShowLabel = true,
-				Align = "LEFT",
-				Color = 2,
-			},
-			zone = {
-				ShowLabel = true,
-				Align = "CENTER",
-			},
-			rank = {
-				ShowLabel = true,
-				Align = "LEFT",
-				Color = 1,
-				EnableScript = true,
-			},
-			note = {
-				ShowLabel = true,
-				Align = "LEFT",
-			},
-			officernote = {
-				ShowLabel = true,
-				Align = "LEFT",
-			},
-			notecombi = {
-				ShowLabel = true,
-				Align = "LEFT",
-			},
-			acmpoints = {
-				ShowLabel = true,
-				Align = "LEFT",
-				Color = 1,
-			},
-			tradeskills = {
-				ShowLabel = true,
-				Align = "CENTER",
-				Enable = false,
-				EnableScript = true,
-			},
-			class = {
-				ShowLabel = false,
-				Align = "LEFT",
-				Icon = true,
-				Color = 2,
-			},
-			exp = {
-				ShowLabel = true,
-				Align = "LEFT",
-			},
-			grouped = {
-				ShowLabel = false,
-				Align = "RIGHT",
-			},
-		},
-	}};
-end
+show_colored_columns();
 
 function iGuild:OpenOptions()
 	_G.InterfaceOptionsFrame_OpenToCategory(AddonName);
 end
 
-LibStub("AceConfig-3.0"):RegisterOptionsTable(AddonName, CreateConfig);
+LibStub("AceConfig-3.0"):RegisterOptionsTable(AddonName, cfg);
 LibStub("AceConfigDialog-3.0"):AddToBlizOptions(AddonName);
 _G.SlashCmdList["IGUILD"] = iGuild.OpenOptions;
 _G["SLASH_IGUILD1"] = "/iguild";
