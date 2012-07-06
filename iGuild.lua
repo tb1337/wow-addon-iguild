@@ -27,6 +27,14 @@ iGuild.Roster = {};
 local TradeSkillDB; -- table for the tradeskill database, f.e. mining, skinning, etc. Indexes are named as well, see below.
 iGuild.TradeSkills = {}; -- table[charname] => { [1] = TradeSkillDB-Object, [2] = TradeSkillDB-Object }
 
+local ClassTranslate = {};
+for k, v in pairs(_G.LOCALIZED_CLASS_NAMES_MALE) do
+	ClassTranslate[v] = k;
+end
+for k, v in pairs(_G.LOCALIZED_CLASS_NAMES_FEMALE) do
+	ClassTranslate[v] = k;
+end
+
 -----------------------------
 -- Setting up the feed
 -----------------------------
@@ -222,18 +230,18 @@ do
 			if    ( k == "name"  ) then return t[1]
 			elseif( k == "level" ) then return t[2]
 			elseif( k == "class" ) then return t[3]
-			elseif( k == "class_loc" ) then return t[4]
-			elseif( k == "zone"  ) then return t[5]
-			elseif( k == "status") then return t[6]
-			elseif( k == "mobile") then return t[7]
-			elseif( k == "apoints")then return t[8]
-			elseif( k == "arank" ) then return t[9]
-			elseif( k == "grank" ) then return t[10]
-			elseif( k == "grankn") then return t[11]
-			elseif( k == "note"  ) then return t[12]
-			elseif( k == "onote" ) then return t[13]
-			elseif( k == "gxp"   ) then return t[14]
-			elseif( k == "trade" ) then return t[15]
+			elseif( k == "CLASS" ) then return ClassTranslate[t[3]]
+			elseif( k == "zone"  ) then return t[4]
+			elseif( k == "status") then return t[5]
+			elseif( k == "mobile") then return t[6]
+			elseif( k == "apoints")then return t[7]
+			elseif( k == "arank" ) then return t[8]
+			elseif( k == "grank" ) then return t[9]
+			elseif( k == "grankn") then return t[10]
+			elseif( k == "note"  ) then return t[11]
+			elseif( k == "onote" ) then return t[12]
+			elseif( k == "gxp"   ) then return t[13]
+			elseif( k == "trade" ) then return t[14]
 			else return nil end
 		end,
 	};
@@ -246,13 +254,13 @@ do
 		_G.wipe(self.Roster);
 		
 		-- preventing Lua from declaring local values 10000x times per loop - saving memory!
-		local _, charName, guildRank, guildRankN, charLevel, charClassLoc, charZone, guildNote,
-			officerNote, isOnline, charStatus, charClass, acmPoints, acmRank, charMobile;
+		local _, charName, guildRank, guildRankN, charLevel, charClass, charZone, guildNote,
+			officerNote, isOnline, charStatus, _, acmPoints, acmRank, charMobile;
 		local maxXP;
 		
 		for i = 1, total do
-			charName, guildRank, guildRankN, charLevel, charClassLoc, charZone, guildNote, 
-			officerNote, isOnline, charStatus, charClass, acmPoints, acmRank, charMobile = _G.GetGuildRosterInfo(i);
+			charName, guildRank, guildRankN, charLevel, charClass, charZone, guildNote, 
+			officerNote, isOnline, charStatus, _, acmPoints, acmRank, charMobile = _G.GetGuildRosterInfo(i);
 			
 			_, maxXP, _, _ = _G.GetGuildRosterContribution(i);
 			
@@ -261,17 +269,16 @@ do
 					[1]  = charName,
 					[2]  = charLevel,
 					[3]  = charClass,
-					[4]  = charChassLoc,
-					[5]  = charZone or _G.UNKNOWN, -- actually may happen o_O
-					[6]  = charStatus,
-					[7]  = charMobile,
-					[8]  = acmPoints,
-					[9]  = acmRank,
-					[10] = guildRank,
-					[11] = guildRankN,
-					[12] = guildNote or "",
-					[13] = officerNote or "",
-					[14] = maxXP
+					[4]  = charZone or _G.UNKNOWN, -- actually may happen o_O
+					[5]  = charStatus,
+					[6]  = charMobile,
+					[7]  = acmPoints,
+					[8]  = acmRank,
+					[9]  = guildRank,
+					[10] = guildRankN,
+					[11] = guildNote or "",
+					[12] = officerNote or "",
+					[13] = maxXP
 				};
 				
 				if( self.db.Column.tradeskills.Enable ) then
@@ -459,7 +466,7 @@ function iGuild:UpdateTooltip()
 		end
 		
 		if( member ) then
-			Tooltip:SetLineScript(line, "OnMouseDown", LineClick, member[R_CHAR_NAME]);
+			Tooltip:SetLineScript(line, "OnMouseDown", LineClick, member.name);
 		end
 	end
 	

@@ -122,8 +122,7 @@ iGuild.Columns = {
 			
 			-- encolor by class color
 			if( iGuild.db.Column.name.Color == 2 ) then
-				local c = _G.RAID_CLASS_COLORS[member.class];
-				return ("|cff%02x%02x%02x%s%s|r"):format(c.r *255, c.g *255, c.b *255, status, member.name);
+				return ("|c%s%s|r"):format(_G.RAID_CLASS_COLORS[member.CLASS].colorStr, member.name);
 			-- no color
 			else
 				return (COLOR_GOLD):format(status..member.name);
@@ -258,16 +257,15 @@ iGuild.Columns = {
 		label = L["Class"],
 		brush = function(member)
 			if( iGuild.db.Column.class.Icon ) then
-				return "|TInterface\\Addons\\iGuild\\Images\\"..member.class..":14:14|t";
+				return "|TInterface\\Addons\\iGuild\\Images\\"..member.CLASS..":14:14|t";
 			end
 			
 			-- encolor by class color
 			if( iGuild.db.Column.class.Color == 2 ) then
-				local c = _G.RAID_CLASS_COLORS[member.class];
-				return ("|cff%02x%02x%02x%s|r"):format(c.r *255, c.g *255, c.b *255, v[member.class_loc]);
+				return ("|c%s%s|r"):format(_G.RAID_CLASS_COLORS[member.CLASS].colorStr, member.class);
 			-- no color
 			else
-				return (COLOR_GOLD):format(member.class_loc);
+				return (COLOR_GOLD):format(member.class);
 			end
 		end,
 	},
