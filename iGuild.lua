@@ -282,7 +282,7 @@ do
 				};
 				
 				if( self.db.Column.tradeskills.Enable ) then
-					self.Roster[iter][15] = self.TradeSkills[charName];
+					self.Roster[iter][14] = self.TradeSkills[charName];
 				end
 				
 				setmetatable(self.Roster[iter], mt);
