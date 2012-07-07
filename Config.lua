@@ -29,7 +29,7 @@ function iGuild:CreateDB()
 	return { profile = {
 		Display = "grouped, level, class, name, zone, rank",
 		Sort = "name",
-		ShowGuildName = false,
+		ShowGuildName = true,
 		ShowGuildMOTD = false,
 		ShowGuildLevel = false,
 		ShowGuildXP = false,
@@ -129,10 +129,18 @@ cfg = {
 		name = AddonName,
 		order = 1,
 		get = function(info)
-			return iGuild.db.Column[info.arg.k][info.arg.v];
+			if( not info.arg ) then
+				return iGuild.db[info[#info]];
+			else
+				return iGuild.db.Column[info.arg.k][info.arg.v];
+			end
 		end,
-		set = function(info, value, arg)
-			iGuild.db.Column[info.arg.k][info.arg.v] = value;
+		set = function(info, value)
+			if( not info.arg ) then
+				iGuild.db[info[#info]] = value;
+			else
+				iGuild.db.Column[info.arg.k][info.arg.v] = value;
+			end
 		end,
 		args = {
 			Header1 = {
@@ -144,22 +152,16 @@ cfg = {
 				type = "toggle",
 				name = L["Show Guild Name"],
 				order = 5,
-				get = function() return iGuild.db.ShowGuildName end,
-				set = function(info, value) iGuild.db.ShowGuildName = value end,
 			},
 			ShowGuildLevel = {
 				type = "toggle",
 				name = L["Show Guild Level"],
 				order = 10,
-				get = function() return iGuild.db.ShowGuildLevel end,
-				set = function(info, value) iGuild.db.ShowGuildLevel = value end,
 			},
 			ShowGuildXP = {
 				type = "toggle",
 				name = L["Show Guild XP"],
 				order = 15,
-				get = function() return iGuild.db.ShowGuildXP end,
-				set = function(info, value) iGuild.db.ShowGuildXP = value end,
 			},
 			Spacer2 = {
 				type = "description",
@@ -200,9 +202,6 @@ cfg = {
 					
 					return true;
 				end,
-				get = function(info)
-					return iGuild.db.Display;
-				end,
 				set = function(info, value)
 					iGuild.db.Display = value;
 					iGuild:GetDisplayedColumns();
@@ -214,10 +213,8 @@ cfg = {
 				name = _G.GUILD_MOTD,
 				order = 80,
 				width = "double",
-				get = function() return iGuild.db.ShowGuildMOTD end,
-				set = function(info, value) iGuild.db.ShowGuildMOTD = value end,
 			},
-			Sorting = {
+			Sort = {
 				type = "select",
 				name = L["Sorting"],
 				order = 90,
@@ -229,8 +226,6 @@ cfg = {
 					["points"] = L["By Achievement Points"],
 					["zone"] = L["By Zone"],
 				},
-				get = function() return iGuild.db.Sort end,
-				set = function(info, value) iGuild.db.Sort = value end,
 			},			
 			Spacer3 = {
 				type = "description",
