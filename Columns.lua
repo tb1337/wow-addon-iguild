@@ -2,8 +2,7 @@
 -- Get the addon table
 -----------------------------
 
-local AddonName = select(1, ...);
-local iGuild = LibStub("AceAddon-3.0"):GetAddon(AddonName);
+local AddonName, iGuild = ...;
 
 local L = LibStub("AceLocale-3.0"):GetLocale(AddonName);
 
@@ -12,6 +11,8 @@ local LibTourist = LibStub("LibTourist-3.0"); -- a really memory-eating lib.
 
 local _G = _G; -- I always use _G.FUNC when I call a Global. Upvalueing done here.
 local format = string.format;
+
+local iconSize = 14;
 
 -----------------------------------------
 -- Variables, functions and colors
@@ -94,7 +95,7 @@ iGuild.Sort = {
 
 iGuild.Columns = {
 	level = {
-		label = L["Level"],
+		label = _G.LEVEL,
 		brush = function(member)
 			-- encolor by difficulty
 			if( iGuild.db.Column.level.Color == 2 ) then
@@ -110,7 +111,7 @@ iGuild.Columns = {
 		end,
 	},
 	name = {
-		label = L["Name"],
+		label = _G.NAME,
 		brush = function(member)
 			local status = "";
 			
@@ -130,7 +131,7 @@ iGuild.Columns = {
 		end,
 	},
 	zone = {
-		label = L["Zone"],
+		label = _G.ZONE,
 		brush = function(member)
 			-- encolor by hostility
 			local r, g, b = LibTourist:GetFactionColor(member.zone);
@@ -138,7 +139,7 @@ iGuild.Columns = {
 		end,
 	},
 	rank = {
-		label = L["Rank"],
+		label = _G.RANK,
 		brush = function(member)
 			-- encolor by threshold
 			if( iGuild.db.Column.rank.Color == 2 ) then
@@ -175,7 +176,7 @@ iGuild.Columns = {
 		canUse = function() return _G.CanViewOfficerNote() end,
 	},
 	notecombi = {
-		label = L["Note"],
+		label = L["Note"].."*",
 		brush = function(member)
 			local normal, officer;
 			local note = "";
@@ -213,26 +214,22 @@ iGuild.Columns = {
 		end,
 	},
 	tradeskills = {
-		label = L["TradeSkills"],
+		label = L["Tradeskills"],
 		brush = function(member)
-			if( not iGuild.db.Column.tradeskills.Enable ) then
-				return (COLOR_GOLD):format(_G.UNKNOWN);
-			end
+			local label = "";
 			
 			local ts = iGuild.TradeSkills[member.name];
-			local label = "";
-
-			if( type(ts) == "table" ) then
-				if( #ts >= 1 ) then
-					label = ("|T%s:14:14|t"):format("Interface\\Addons\\iGuild\\Images\\"..ts[1].texture);
-				end
-				if( #ts >= 2 ) then
-					label = ("%s |T%s:14:14|t"):format(label, "Interface\\Addons\\iGuild\\Images\\"..ts[2].texture);
-				end
+			if( type(ts) ~= "table" ) then
+				return label;
+			end
+			
+			for i = 1, #ts do
+				label = label..(i == 1 and "" or " ")..("|T%s:%d:%d|t"):format("Interface\\Addons\\iGuild\\Images\\"..ts[i].texture, iconSize, iconSize);
 			end
 			
 			return label;
 		end,
+		canUse = function() return iGuild.db.Column.tradeskills.Enable end,
 		script = function(_, member, button)
 			local ts = iGuild.TradeSkills[member.name];
 			if( type(ts) ~= "table" ) then
@@ -254,10 +251,10 @@ iGuild.Columns = {
 		end,
 	},
 	class = {
-		label = L["Class"],
+		label = _G.CLASS,
 		brush = function(member)
 			if( iGuild.db.Column.class.Icon ) then
-				return "|TInterface\\Addons\\iGuild\\Images\\"..member.CLASS..":14:14|t";
+				return "|TInterface\\Addons\\iGuild\\Images\\"..member.CLASS..":"..iconSize..":"..iconSize.."|t";
 			end
 			
 			-- encolor by class color
@@ -281,7 +278,7 @@ iGuild.Columns = {
 		label = _G.GROUP,
 		brush = function(member)
 			if( _G.UnitInParty(member.name) or _G.UnitInRaid(member.name) ) then
-				return "|TInterface\\RAIDFRAME\\ReadyCheck-Ready:14:14|t";
+				return "|TInterface\\RAIDFRAME\\ReadyCheck-Ready:"..iconSize..":"..iconSize.."|t";
 			else
 				return "";
 			end

@@ -2,8 +2,7 @@
 -- Get the addon table
 -----------------------------
 
-local AddonName = select(1, ...);
-local iGuild = LibStub("AceAddon-3.0"):GetAddon(AddonName);
+local AddonName, iGuild = ...;
 
 local L = LibStub("AceLocale-3.0"):GetLocale(AddonName);
 
@@ -145,7 +144,7 @@ cfg = {
 		args = {
 			Header1 = {
 				type = "header",
-				name = "Feed Options",
+				name = L["Feed Options"],
 				order = 2,
 			},
 			ShowGuildName = {
@@ -171,7 +170,7 @@ cfg = {
 			},
 			Header2 = {
 				type = "header",
-				name = "Tooltip Options",
+				name = L["Tooltip Options"],
 				order = 30,
 			},
 			Infotext1 = {
@@ -196,6 +195,7 @@ cfg = {
 					
 					for i, v in ipairs(list) do
 						if( not iGuild.Columns[strtrim(v)] ) then
+							_G.StaticPopup_Show("IADDONS_ERROR_CFG");
 							return L["Invalid column name!"];
 						end
 					end
@@ -457,7 +457,7 @@ cfg = {
 					},
 					EnableOption = {
 						type = "toggle",
-						name = "|cffff0000"..L["Enable TradeSkills"].."|r",
+						name = "|cffff0000"..L["Enable Tradeskills"].."|r",
 						width = "full",
 						order = 20,
 						arg = {k = "tradeskills", v = "Enable"},
@@ -695,3 +695,12 @@ LibStub("AceConfig-3.0"):RegisterOptionsTable(AddonName, cfg);
 LibStub("AceConfigDialog-3.0"):AddToBlizOptions(AddonName);
 _G.SlashCmdList["IGUILD"] = iGuild.OpenOptions;
 _G["SLASH_IGUILD1"] = "/iguild";
+
+_G.StaticPopupDialogs["IADDONS_ERROR_CFG"] = {
+	preferredIndex = 3, -- apparently avoids some UI taint
+	text = L["Invalid column name!"],
+	button1 = _G.OKAY,
+	showAlert = 1,
+	timeout = 2.5,
+	hideOnEscape = true,
+};
