@@ -2,7 +2,7 @@ package-as: iGuild
 enable-nolib-creation: no
 
 ignore:
-  - Libs/AceAddon-3.0
+  - Libs/AceBucket-3.0
   - Libs/AceConfig-3.0
   - Libs/AceDB-3.0
   - Libs/AceEvent-3.0
@@ -12,7 +12,6 @@ ignore:
   - Libs/CallbackHandler-1.0
   - Libs/LibBabble-Zone-3.0
   - Libs/LibCrayon-3.0
-  - Libs/LibQTip-1.0
   - Libs/LibStub
   - Libs/LibTourist-3.0
   - Developer.lua
@@ -26,12 +25,10 @@ externals:
     url: svn://svn.wowace.com/wow/libbabble-zone-3-0/mainline/trunk
   Libs/LibTourist-3.0:
     url: svn://svn.wowace.com/wow/libtourist-3-0/mainline/trunk
-  Libs/LibQTip-1.0:
-    url: svn://svn.wowace.com/wow/libqtip-1-0/mainline/trunk
   Libs/LibCrayon-3.0:
     url: svn://svn.wowace.com/wow/libcrayon-3-0/mainline/trunk
-  Libs/AceAddon-3.0:
-    url: svn://svn.wowace.com/wow/ace3/mainline/trunk/AceAddon-3.0
+  Libs/AceBucket-3.0:
+    url: svn://svn.wowace.com/wow/ace3/mainline/trunk/AceBucket-3.0
   Libs/AceGUI-3.0:
     url: svn://svn.wowace.com/wow/ace3/mainline/trunk/AceGUI-3.0
   Libs/AceConfig-3.0:
@@ -45,8 +42,10 @@ externals:
   Libs/AceTimer-3.0:
     url: svn://svn.wowace.com/wow/ace3/mainline/trunk/AceTimer-3.0
 
-required-dependencies:
-  - libstub
+optional-dependencies:
+  - libbabble-zone-3-0
+  - libtourist-3-0
+  - libcrayon-3-0
 
 tools-used:
   - libdatabroker-1-1

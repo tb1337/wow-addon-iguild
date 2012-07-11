@@ -2,21 +2,27 @@
 -- Setting up scope, upvalues and libs
 -----------------------------------
 
-local AddonName = select(1, ...); -- vararg returns "addonname, scope" in this case
-iGuild = LibStub("AceAddon-3.0"):NewAddon(AddonName, "AceEvent-3.0");
+local AddonName, iGuild = ...;
+LibStub("AceEvent-3.0"):Embed(iGuild);
+LibStub("AceTimer-3.0"):Embed(iGuild);
+LibStub("AceBucket-3.0"):Embed(iGuild);
 
 local L = LibStub("AceLocale-3.0"):GetLocale(AddonName);
 
-local LibQTip = LibStub("LibQTip-1.0");
-
 local _G = _G; -- I always use _G.FUNC when I call a Global. Upvalueing done here.
 local format = string.format;
+
+-------------------------------
+-- Registering with iLib
+-------------------------------
+
+LibStub("iLib"):Register(AddonName, nil, iGuild);
 
 -----------------------------------------
 -- Variables, functions and colors
 -----------------------------------------
 
-local Tooltip; -- our tooltip
+local Bucket;
 local RosterTimer; -- timer when the roster is fetched again
 
 local COLOR_GOLD = "|cfffed100%s|r";
@@ -26,6 +32,7 @@ iGuild.Roster = {};
 
 local TradeSkillDB; -- table for the tradeskill database, f.e. mining, skinning, etc. Indexes are named as well, see below.
 iGuild.TradeSkills = {}; -- table[charname] => { [1] = TradeSkillDB-Object, [2] = TradeSkillDB-Object }
+_G.TS=iGuild.TradeSkills;
 
 local ClassTranslate = {};
 for k, v in pairs(_G.LOCALIZED_CLASS_NAMES_MALE) do
@@ -36,28 +43,28 @@ for k, v in pairs(_G.LOCALIZED_CLASS_NAMES_FEMALE) do
 end
 
 -----------------------------
--- Setting up the feed
+-- Setting up the LDB
 -----------------------------
 
-iGuild.Feed = LibStub("LibDataBroker-1.1"):NewDataObject(AddonName, {
+iGuild.ldb = LibStub("LibDataBroker-1.1"):NewDataObject(AddonName, {
 	type = "data source",
 	text = "",
 	icon = "Interface\\Addons\\iGuild\\Images\\iGuild",
 });
 
-iGuild.Feed.OnClick = function(_, button)
+iGuild.ldb.OnClick = function(_, button)
 	if( button == "LeftButton" ) then
-		if( _G.IsAltKeyDown() and _G.CanGuildInvite() ) then
-			if( _G.StaticPopup_FindVisible("ADD_GUILDMEMBER") ) then
-				_G.StaticPopup_Hide("ADD_GUILDMEMBER");
-			else
+		if( _G.IsModifierKeyDown() ) then
+			if( _G.IsAltKeyDown() and _G.CanGuildInvite() ) then
 				_G.StaticPopup_Show("ADD_GUILDMEMBER");
 			end
 		else
 			_G.ToggleGuildFrame(1);
 		end
 	elseif( button == "RightButton" ) then
-		iGuild:OpenOptions();
+		if( not _G.IsModifierKeyDown() ) then
+			iGuild:OpenOptions();
+		end
 --@do-not-package@
 	elseif( button == "MiddleButton" ) then
 		iGuild:CountAchievements();	
@@ -65,25 +72,19 @@ iGuild.Feed.OnClick = function(_, button)
 	end
 end
 
-iGuild.Feed.OnEnter = function(anchor)
-	if( not _G.IsInGuild() ) then
+iGuild.ldb.OnEnter = function(anchor)
+	if( iGuild:IsTooltip("Main") or not _G.IsInGuild() ) then
 		return; -- When not in a guild, fires no tooltip. I dislike addons which show a tooltip with the info "You are not in a guild!".
 	end
+	iGuild:HideAllTooltips();
 	
-	-- LibQTip has the power to show one or more tooltips, but on a broker bar, where more than one QTips are present, this is really disturbing.
-	-- So we release the tooltips of the i-Addons here.
-	for k, v in LibQTip:IterateTooltips() do
-		if( type(k) == "string" and strsub(k, 1, 6) == "iSuite" ) then
-			v:Release(k);
-		end
-	end
-		
-	Tooltip = LibQTip:Acquire("iSuite"..AddonName);
-	Tooltip:SetAutoHideDelay(0.1, anchor);
-	Tooltip:SmartAnchorTo(anchor);
-	iGuild:UpdateTooltip();
-	Tooltip:Show();
+	local tip = iGuild:GetTooltip("Main", "UpdateTooltip");
+	tip:SmartAnchorTo(anchor);
+	tip:SetAutoHideDelay(0.25, anchor);
+	tip:Show();
 end
+
+iGuild.ldb.OnLeave = function() end -- some display addons refuse to display brokers when this is not defined
 
 -- the DisplayedColumns table defines which columns gonna be displayed in the tooltip. It sorts out columns we cannot use (CanUse option).
 iGuild.DisplayedColumns = {};
@@ -108,10 +109,10 @@ function iGuild:GetDisplayedColumns()
 end
 
 ----------------------
--- OnInitialize
+-- Boot
 ----------------------
 
-function iGuild:OnInitialize()
+function iGuild:Boot()
 	self.db = LibStub("AceDB-3.0"):New("iGuildDB", self:CreateDB(), "Default").profile;
 
 	-- dirty check if someone is using an old iGuild config, where this setting was a table
@@ -123,27 +124,77 @@ function iGuild:OnInitialize()
 	-- the following code snippet is used once and deleted after
 	self.show_colored_columns();
 	self.show_colored_columns = nil;
-
-	self:RegisterEvent("GUILD_MOTD", "RosterUpdate");
-	self:RegisterEvent("PLAYER_GUILD_UPDATE", "RosterUpdate");
-	self:RegisterEvent("PLAYER_ENTERING_WORLD", "EnterWorld");
-	self:RegisterEvent("GROUP_ROSTER_UPDATE", "GroupChanged");
+	
+	self:RegisterEvent("PLAYER_GUILD_UPDATE", "EventHandler");
+	self:EventHandler();
 end
+iGuild:RegisterEvent("PLAYER_ENTERING_WORLD", "Boot");
 
-function iGuild:EnterWorld()
+----------------------
+-- RosterUpdate
+----------------------
+
+function iGuild:EventHandler(...)
 	if( _G.IsInGuild() ) then
-		self:RegisterEvent("GUILD_ROSTER_UPDATE", "RosterUpdate");
-		self:RegisterEvent("GUILD_XP_UPDATE", "RosterUpdate");
-		self:RegisterEvent("GUILD_TRADESKILL_UPDATE", "TradeSkillUpdate");
+		if( not RosterTimer ) then
+			Bucket = self:RegisterBucketEvent({
+				"GUILD_MOTD",
+				"GUILD_ROSTER_UPDATE",
+				"GUILD_XP_UPDATE"
+			}, 5, "EventHandler");
+			self:RegisterEvent("GROUP_ROSTER_UPDATE", "GroupChanged");
+			self:RegisterEvent("GUILD_TRADESKILL_UPDATE", "TradeSkillUpdate");
+			
+			-- this three functions are required to query much data from the WoW server.
+			_G.GuildRoster();
+			_G.QueryGuildXP();
+			_G.QueryGuildRecipes();
+						
+			RosterTimer = self:ScheduleRepeatingTimer(_G.GuildRoster, 45);
+		end
 		
-		-- this three functions are required to query much data from the WoW server.
-		_G.GuildRoster();
-		_G.QueryGuildXP();
-		_G.QueryGuildRecipes();
+		local total, totalOn = _G.GetNumGuildMembers();
+		local ldbText = ("%d/%d"):format(totalOn, total);
 		
-		RosterTimer = LibStub("AceTimer-3.0"):ScheduleRepeatingTimer(_G.GuildRoster, 15);
-	else
-		self.Feed.text = L["No guild"];
+		local guildLevel, maxLevel = _G.GetGuildLevel();
+		local guildName = _G.GetGuildInfo("player");
+		
+		-- check if guildname is to be shown on the ldb
+		if( self.db.ShowGuildName and guildName ) then
+			ldbText = (COLOR_GOLD.." %s"):format(guildName, ldbText);
+		end
+		
+		-- check if guildlevel is to be shown on the ldb
+		if( self.db.ShowGuildLevel ) then
+			ldbText = ("%s "..COLOR_GOLD.."%d"):format(ldbText, "| ", guildLevel);
+		end
+		
+		-- check if guild XP is to be shown on the ldb
+		if( self.db.ShowGuildXP ) then
+			local currXP, nextUp = _G.UnitGetGuildXP("player");
+			ldbText = ("%s (%d%%)"):format(ldbText, guildLevel < maxLevel and math.ceil(currXP / (currXP + nextUp) * 100) or 100);
+		end
+		
+		self.ldb.text = ldbText;
+		self:SetupGuildRoster();
+		self:CheckTooltips();
+	else -- Not in Guild!
+		if( RosterTimer ) then
+			self:UnregisterBucket(Bucket);
+			self:UnregisterEvent("GROUP_ROSTER_UPDATE");
+			self:UnregisterEvent("GUILD_TRADESKILL_UPDATE");
+			
+			self:CancelTimer(RosterTimer);
+			RosterTimer = nil;
+		end
+		
+		_G.wipe(self.Roster);
+		_G.wipe(self.TradeSkills);
+		
+		self.ldb.text = L["No guild"];
+		if( self:IsTooltip("Main") ) then
+			self:HideAllTooltips();
+		end
 	end
 end
 
@@ -153,69 +204,7 @@ end
 
 function iGuild:GroupChanged()
 	self:GetDisplayedColumns();
-	
-	if( LibQTip:IsAcquired("iSuite"..AddonName) ) then
-		self:UpdateTooltip();
-	end
-end
-
-----------------------
--- RosterUpdate
-----------------------
-
-function iGuild:RosterUpdate(event)
-	if( _G.IsInGuild() ) then
-		if( not RosterTimer ) then
-			self:EnterWorld();
-		end
-		
-		local total, totalOn = _G.GetNumGuildMembers();
-		local feedText = ("%d/%d"):format(totalOn, total);
-		
-		local guildLevel, maxLevel = _G.GetGuildLevel();
-		local guildName = _G.GetGuildInfo("player");
-		
-		-- check if guildname is to be shown on the feed
-		if( self.db.ShowGuildName and guildName ) then
-			feedText = (COLOR_GOLD.." %s"):format(guildName, feedText);
-		end
-		
-		-- check if guildlevel is to be shown on the feed
-		if( self.db.ShowGuildLevel ) then
-			feedText = ("%s "..COLOR_GOLD.."%d"):format(feedText, "| ", guildLevel);
-		end
-		
-		-- check if guild XP is to be shown on the feed
-		if( self.db.ShowGuildXP ) then
-			local currXP, nextUp = _G.UnitGetGuildXP("player");
-			feedText = ("%s (%d%%)"):format(feedText, guildLevel < maxLevel and math.ceil(currXP / (currXP + nextUp) * 100) or 100);
-		end
-		
-		self.Feed.text = feedText;		
-		self:SetupGuildRoster();
-		
-		-- we just require this event once, thus removing it here.
-		if( event == "GUILD_XP_UPDATE" ) then
-			self:UnregisterEvent("GUILD_XP_UPDATE");
-		end
-	else -- Not in Guild!
-		if( RosterTimer ) then
-			self:UnregisterEvent("GUILD_ROSTER_UPDATE");
-			self:UnregisterEvent("GUILD_XP_UPDATE");
-			self:UnregisterEvent("GUILD_TRADESKILL_UPDATE");
-			LibStub("AceTimer-3.0"):CancelTimer(RosterTimer);
-			RosterTimer = nil;
-		end
-		
-		_G.wipe(self.Roster);
-		_G.wipe(self.TradeSkills);
-		
-		self.Feed.text = L["No guild"];
-	end
-	
-	if( LibQTip:IsAcquired("iSuite"..AddonName) ) then
-		self:UpdateTooltip();
-	end
+	self:CheckTooltips("Main");
 end
 
 --------------------------
@@ -305,10 +294,12 @@ end
 do
 	local mt = {
 		__index = function(t, k)
-			if( k == "name" ) then return t[1]
-			elseif( k == "id" ) then return t[2]
-			elseif( k == "texture" ) then return t[3]
-			elseif( k == "collapsed" ) then return t[4]
+			if(     k == "level"     ) then return t[1]
+			elseif( k == "name"      ) then return t[2]
+			elseif( k == "id"        ) then return t[3]
+			elseif( k == "texture"   ) then return t[4]
+			elseif( k == "collapsed" ) then return t[5]
+			
 			end
 		end,
 	};
@@ -329,10 +320,11 @@ do
 				-- when headerName is set, this is a tradeskill for our DB
 				if( headerName ) then
 					TradeSkillDB[headerName] = {
-						[1] = headerName,
-						[2] = skillID,
-						[3] = iconTexture,
-						[4] = isCollapsed
+						[1] = 0,
+						[2] = headerName,
+						[3] = skillID,
+						[4] = iconTexture,
+						[5] = isCollapsed
 					};
 					
 					setmetatable(TradeSkillDB[headerName], mt);
@@ -358,7 +350,7 @@ do
 		
 		local currentTradeSkill;
 		for i = 1, _G.GetNumGuildTradeSkill() do
-			local _, _, _, headerName, _, _, _, playerName, _, _, _, _, _, _ = _G.GetGuildTradeSkillInfo(i);
+			local _, _, _, headerName, _, _, _, playerName, _, _, _, skillLevel, _, _ = _G.GetGuildTradeSkillInfo(i);
 			
 			if( headerName ) then
 				currentTradeSkill = headerName;
@@ -367,6 +359,7 @@ do
 					self.TradeSkills[playerName] = {};
 				end
 				
+				TradeSkillDB[currentTradeSkill][1] = skillLevel;
 				table.insert(self.TradeSkills[playerName], TradeSkillDB[currentTradeSkill]);
 			end
 		end
@@ -391,51 +384,49 @@ end
 
 local function LineClick(_, name, button)
 	if( button == "LeftButton" ) then
-		if( _G.IsAltKeyDown() ) then
-			_G.InviteUnit(name);
+		if( _G.IsModifierKeyDown() ) then
+			if( _G.IsAltKeyDown() ) then
+				_G.InviteUnit(name);
+			end
 		else
 			_G.SetItemRef(("player:%s"):format(name), ("|Hplayer:%s|h[%s]|h"):format(name, name), "LeftButton");
 		end
 	end
 end
 
-local function RosterMOTDChangeClick(_, var, button)
+local function ChangeMOTDClick(_, var, button)
 	if( button == "LeftButton" ) then
 		_G.GuildTextEditFrame_Show("motd");
 	end
 end
 
-function iGuild:UpdateTooltip()
-	Tooltip:Clear();
-	Tooltip:SetColumnLayout(#self.DisplayedColumns);
+function iGuild:UpdateTooltip(tip)
+	tip:Clear();
+	tip:SetColumnLayout(#self.DisplayedColumns);
 	
-	local name, info, line;
+	local name, info, line, member;
 	
 	-- if MOTD is to be shown, place it first!
-	if( self.db.ShowGuildMOTD and _G.GetGuildRosterMOTD() and _G.GetGuildRosterMOTD() ~= "" ) then
+	if( self.db.ShowGuildMOTD and _G.GetGuildRosterMOTD() ~= "" ) then
 		local edit = _G.CanEditMOTD();
 		
 		-- at first, we add MOTD title and eventually a change button
-		line = Tooltip:AddLine(" ");
-		Tooltip:SetCell(line, 1, (COLOR_GOLD):format(_G.GUILD_MOTD..":"), nil, "LEFT", #self.DisplayedColumns - (edit and 1 or 0));
+		line = tip:AddLine(" ");
+		tip:SetCell(line, 1, (COLOR_GOLD..(edit and " "..L["change"] or "")):format(_G.GUILD_MOTD), nil, "LEFT", 0);
 		
-		-- if we may change MOTD, the change button will be shown
 		if( edit ) then
-			Tooltip:SetCell(line, #self.DisplayedColumns, (COLOR_GOLD):format("["..L["Change"].."]"), nil, "RIGHT");
-			Tooltip:SetCellScript(line, #self.DisplayedColumns, "OnMouseDown", RosterMOTDChangeClick);
+			tip:SetCellScript(line, 1, "OnMouseDown", ChangeMOTDClick);
 		end
 		
 		-- now we add the MOTD text
-		line = Tooltip:AddLine(" ");
-		Tooltip:SetCell(line, 1, _G.GetGuildRosterMOTD(), nil, "LEFT", #self.DisplayedColumns);
+		line = tip:AddLine(" ");
+		tip:SetCell(line, 1, _G.GetGuildRosterMOTD(), nil, "LEFT", 0);
 		
-		Tooltip:AddLine(" "); -- space between MOTD and Roster
+		tip:AddLine(" "); -- space between MOTD and Roster
 	end
 	
 	-- Looping thru Roster and displaying columns and lines
 	for y = 0, #self.Roster do
-		local member;
-		
 		for x = 1, #self.DisplayedColumns do
 			name = self.DisplayedColumns[x];
 			info = self.Columns[name];
@@ -443,9 +434,9 @@ function iGuild:UpdateTooltip()
 			-- check if we add a line or a header
 			if( x == 1 ) then
 				if( y == 0 ) then
-					line = Tooltip:AddHeader(" "); -- we have line 0, it's the header line.
+					line = tip:AddHeader(" "); -- we have line 0, it's the header line.
 				else
-					line = Tooltip:AddLine(" "); -- all others are member lines.
+					line = tip:AddLine(" "); -- all others are member lines.
 				end
 			end
 			
@@ -453,21 +444,21 @@ function iGuild:UpdateTooltip()
 			if( y == 0 ) then
 				if( self.db.Column[name].ShowLabel ) then
 					-- in the header line (y = 0), we check if column labels are to be shown.
-					Tooltip:SetCell(line, x, info.label, nil, self.db.Column[name].Align);
+					tip:SetCell(line, x, info.label, nil, self.db.Column[name].Align);
 				end
 			else
 				member = self.Roster[y]; -- fetch member from Roster and brush infos to the cells
-				Tooltip:SetCell(line, x, info.brush(member), nil, self.db.Column[name].Align);
+				tip:SetCell(line, x, info.brush(member), nil, self.db.Column[name].Align);
 				
 				if( info.script and self.db.Column[name].EnableScript and info.scriptUse(member) ) then
-					Tooltip:SetCellScript(line, x, "OnMouseDown", info.script, member);
+					tip:SetCellScript(line, x, "OnMouseDown", info.script, member);
 				end
 			end
-		end
+		end -- end for x
 		
 		if( member ) then
-			Tooltip:SetLineScript(line, "OnMouseDown", LineClick, member.name);
+			tip:SetLineScript(line, "OnMouseDown", LineClick, member.name);
+			member = nil;
 		end
-	end
-	
+	end -- end for y
 end
