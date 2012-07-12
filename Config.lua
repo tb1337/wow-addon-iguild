@@ -32,6 +32,7 @@ function iGuild:CreateDB()
 		ShowGuildMOTD = false,
 		ShowGuildLevel = false,
 		ShowGuildXP = false,
+		ShowLabels = true, -- this option can just be set by the mod itself
 		Column = {
 			level = {
 				ShowLabel = false,
@@ -75,6 +76,8 @@ function iGuild:CreateDB()
 				Align = "CENTER",
 				Enable = false,
 				EnableScript = true,
+				ShowProgress = true,
+				Color = 2,
 			},
 			class = {
 				ShowLabel = false,
@@ -123,6 +126,19 @@ end
 -- for usage once
 iGuild.show_colored_columns = show_colored_columns;
 
+local function check_labels_hide()
+	local show = false;
+	
+	for i, v in ipairs(iGuild.DisplayedColumns) do
+		if( iGuild.db.Column[v].ShowLabel ) then
+			show = true;
+			break;
+		end
+	end
+	
+	iGuild.db.ShowLabels = show;
+end
+
 cfg = {
 		type = "group",
 		name = AddonName,
@@ -139,12 +155,15 @@ cfg = {
 				iGuild.db[info[#info]] = value;
 			else
 				iGuild.db.Column[info.arg.k][info.arg.v] = value;
+				if( info[#info] == "ShowLabel" ) then
+					check_labels_hide();
+				end
 			end
 		end,
 		args = {
 			Header1 = {
 				type = "header",
-				name = L["Feed Options"],
+				name = L["Plugin Options"],
 				order = 2,
 			},
 			ShowGuildName = {
@@ -447,11 +466,27 @@ cfg = {
 						},
 						arg = {k = "tradeskills", v = "Align"},
 					},
+					ShowProgress = {
+						type = "toggle",
+						name = L["Show Progress"],
+						order = 15,
+						arg = {k = "tradeskills", v = "ShowProgress"},
+					},
+					ColorOption = {
+						type = "select",
+						name = _G.COLOR,
+						order = 20,
+						values = {
+							[1] = _G.NONE,
+							[2] = L["By Threshold"],
+						},
+						arg = {k = "tradeskills", v = "Color"},
+					},
 					EnableScript = {
 						type = "toggle",
 						name = L["Enable Script"],
 						desc = L["If activated, clicking on the given cell will result in something special."],
-						order = 15,
+						order = 25,
 						width = "full",
 						arg = {k = "tradeskills", v = "EnableScript"},
 					},
@@ -459,14 +494,14 @@ cfg = {
 						type = "toggle",
 						name = "|cffff0000"..L["Enable Tradeskills"].."|r",
 						width = "full",
-						order = 20,
+						order = 30,
 						arg = {k = "tradeskills", v = "Enable"},
 					},
 					Infotext1 = {
 						type = "description",
 						name = "|cffff0000"..L["Querying tradeskills needs extra memory. This is why you explicitly have to enable that. Don't forget to reload your UI!"].."\n",
 						fontSize = "medium",
-						order = 25,
+						order = 35,
 					},
 				},
 			},

@@ -32,7 +32,6 @@ iGuild.Roster = {};
 
 local TradeSkillDB; -- table for the tradeskill database, f.e. mining, skinning, etc. Indexes are named as well, see below.
 iGuild.TradeSkills = {}; -- table[charname] => { [1] = TradeSkillDB-Object, [2] = TradeSkillDB-Object }
-_G.TS=iGuild.TradeSkills;
 
 local ClassTranslate = {};
 for k, v in pairs(_G.LOCALIZED_CLASS_NAMES_MALE) do
@@ -134,7 +133,7 @@ iGuild:RegisterEvent("PLAYER_ENTERING_WORLD", "Boot");
 -- RosterUpdate
 ----------------------
 
-function iGuild:EventHandler(...)
+function iGuild:EventHandler()
 	if( _G.IsInGuild() ) then
 		if( not RosterTimer ) then
 			Bucket = self:RegisterBucketEvent({
@@ -149,7 +148,7 @@ function iGuild:EventHandler(...)
 			_G.GuildRoster();
 			_G.QueryGuildXP();
 			_G.QueryGuildRecipes();
-						
+			
 			RosterTimer = self:ScheduleRepeatingTimer(_G.GuildRoster, 45);
 		end
 		
@@ -231,6 +230,14 @@ do
 			elseif( k == "onote" ) then return t[12]
 			elseif( k == "gxp"   ) then return t[13]
 			elseif( k == "trade" ) then return t[14]
+			elseif( k == "ts1" )   then return t[14]
+			elseif( k == "ts1prog" and t[14] ) then return iGuild.TradeSkills[t[1]][2]
+			elseif( k == "ts1id"   and t[14] ) then return TradeSkillDB[t[14]][2]
+			elseif( k == "ts1tex"  and t[14] ) then return TradeSkillDB[t[14]][3]
+			elseif( k == "ts2" )   then return t[15]
+			elseif( k == "ts2prog" and t[15] ) then return iGuild.TradeSkills[t[1]][4]
+			elseif( k == "ts2id"   and t[15] ) then return TradeSkillDB[t[15]][2]
+			elseif( k == "ts2tex"  and t[15] ) then return TradeSkillDB[t[15]][3]
 			else return nil end
 		end,
 	};
@@ -270,8 +277,13 @@ do
 					[13] = maxXP
 				};
 				
-				if( self.db.Column.tradeskills.Enable ) then
-					self.Roster[iter][14] = self.TradeSkills[charName];
+				if( self.db.Column.tradeskills.Enable and self.TradeSkills[charName] ) then
+					if( #self.TradeSkills[charName] >= 2 ) then
+						self.Roster[iter][14] = self.TradeSkills[charName][1];
+					end
+					if( #self.TradeSkills[charName] >= 4 ) then
+						self.Roster[iter][15] = self.TradeSkills[charName][3];
+					end
 				end
 				
 				setmetatable(self.Roster[iter], mt);
@@ -291,91 +303,73 @@ end
 -- TradeSkillsFetched determines if the tradeskills are previously updated and quits the function.
 -- TradeSkillsUpdating is set to 1 when the below function is working. This is strongly recommended to prevent recursion!
 
-do
-	local mt = {
-		__index = function(t, k)
-			if(     k == "level"     ) then return t[1]
-			elseif( k == "name"      ) then return t[2]
-			elseif( k == "id"        ) then return t[3]
-			elseif( k == "texture"   ) then return t[4]
-			elseif( k == "collapsed" ) then return t[5]
-			
-			end
-		end,
-	};
-
-	local TradeSkillsFetched, TradeSkillsUpdating;
-	function iGuild:TradeSkillUpdate()
-		if( not self.db.Column.tradeskills.Enable ) then
-			return;
-		end
-		
-		-- no tradeskill db, so we generate it from scratch.
-		if( not TradeSkillDB ) then
-			TradeSkillDB = {};
-			
-			for i = 1, _G.GetNumGuildTradeSkill() do
-				local skillID, isCollapsed, iconTexture, headerName, _, _, _, _, _, _, _, _, _, _ = _G.GetGuildTradeSkillInfo(i);
-				
-				-- when headerName is set, this is a tradeskill for our DB
-				if( headerName ) then
-					TradeSkillDB[headerName] = {
-						[1] = 0,
-						[2] = headerName,
-						[3] = skillID,
-						[4] = iconTexture,
-						[5] = isCollapsed
-					};
-					
-					setmetatable(TradeSkillDB[headerName], mt);
-				end
-			end
-		end
-		
-		-- prevent recursion
-		if( TradeSkillsFetched or TradeSkillsUpdating ) then
-			return;
-		end
-		TradeSkillsUpdating = 1;
-		
-		-- We need to expand the tradeskills in the guild-tradeskill tab in order to fetch the members.
-		for _, skill in pairs(TradeSkillDB) do
-			_G.ExpandGuildTradeSkillHeader(skill.id);
-		end
-		
-		-- loop through all tradeskills and users
-		_G.wipe(iGuild.TradeSkills);
-		local showOffline = _G.GetGuildRosterShowOffline(); -- store showOffline info set by the user
-		_G.SetGuildRosterShowOffline(true);
-		
-		local currentTradeSkill;
-		for i = 1, _G.GetNumGuildTradeSkill() do
-			local _, _, _, headerName, _, _, _, playerName, _, _, _, skillLevel, _, _ = _G.GetGuildTradeSkillInfo(i);
-			
-			if( headerName ) then
-				currentTradeSkill = headerName;
-			elseif( playerName ) then
-				if( not self.TradeSkills[playerName] ) then
-					self.TradeSkills[playerName] = {};
-				end
-				
-				TradeSkillDB[currentTradeSkill][1] = skillLevel;
-				table.insert(self.TradeSkills[playerName], TradeSkillDB[currentTradeSkill]);
-			end
-		end
-		
-		_G.SetGuildRosterShowOffline(showOffline); -- reset showOffline to not change users configuration
-		
-		-- We collapse the headers again if they were collapsed by the user before.
-		for _, skill in pairs(TradeSkillDB) do		
-			if( skill.collapsed ) then
-				_G.CollapseGuildTradeSkillHeader(skill.id);
-			end
-		end
-		
-		TradeSkillsFetched = 1;
-		TradeSkillsUpdating = nil;
+local TradeSkillsFetched, TradeSkillsUpdating;
+function iGuild:TradeSkillUpdate()
+	if( not self.db.Column.tradeskills.Enable ) then
+		return;
 	end
+	
+	-- no tradeskill db, so we generate it from scratch.
+	if( not TradeSkillDB ) then
+		TradeSkillDB = {};
+		
+		for i = 1, _G.GetNumGuildTradeSkill() do
+			local skillID, isCollapsed, iconTexture, headerName, _, _, _, _, _, _, _, _, _, _ = _G.GetGuildTradeSkillInfo(i);
+			-- when headerName is set, this is a tradeskill for our DB
+			if( headerName ) then
+				TradeSkillDB[headerName] = {
+					[1] = headerName,
+					[2] = skillID,
+					[3] = iconTexture,
+					[4] = isCollapsed
+				};
+			end
+		end
+	end
+	
+	-- prevent recursion
+	if( TradeSkillsFetched or TradeSkillsUpdating ) then
+		return;
+	end
+	TradeSkillsUpdating = 1;
+	
+	-- We need to expand the tradeskills in the guild-tradeskill tab in order to fetch the members.
+	for _, skill in pairs(TradeSkillDB) do
+		_G.ExpandGuildTradeSkillHeader(skill[2]);
+	end
+	
+	-- loop through all tradeskills and users
+	_G.wipe(iGuild.TradeSkills);
+	local showOffline = _G.GetGuildRosterShowOffline(); -- store showOffline info set by the user
+	_G.SetGuildRosterShowOffline(true);
+	
+	local currentTradeSkill;
+	for i = 1, _G.GetNumGuildTradeSkill() do
+		local _, _, _, headerName, _, _, _, playerName, _, _, _, skillLevel, _, _ = _G.GetGuildTradeSkillInfo(i);
+		
+		if( headerName ) then
+			currentTradeSkill = headerName;
+		elseif( playerName ) then
+			if( not self.TradeSkills[playerName] ) then
+				self.TradeSkills[playerName] = {};
+			end
+			table.insert(self.TradeSkills[playerName], currentTradeSkill);
+			table.insert(self.TradeSkills[playerName], skillLevel);
+		end
+	end
+	
+	_G.SetGuildRosterShowOffline(showOffline); -- reset showOffline to not change users configuration
+	
+	-- We collapse the headers again if they were collapsed by the user before.
+	for _, skill in pairs(TradeSkillDB) do		
+		if( skill[4] ) then
+			_G.CollapseGuildTradeSkillHeader(skill[2]);
+		end
+	end
+	
+	TradeSkillsFetched = 1;
+	TradeSkillsUpdating = nil;
+	self:EventHandler();
 end
 
 -----------------------
@@ -426,7 +420,7 @@ function iGuild:UpdateTooltip(tip)
 	end
 	
 	-- Looping thru Roster and displaying columns and lines
-	for y = 0, #self.Roster do
+	for y = (self.db.ShowLabels and 0 or 1), #self.Roster do
 		for x = 1, #self.DisplayedColumns do
 			name = self.DisplayedColumns[x];
 			info = self.Columns[name];
