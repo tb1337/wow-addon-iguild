@@ -16,6 +16,7 @@ Libs\LibBabble-Zone-3.0\lib.xml
 Libs\LibTourist-3.0\lib.xml
 Libs\LibCrayon-3.0\lib.xml
 
+Libs\AceBucket-3.0\AceBucket-3.0.xml
 Libs\AceGUI-3.0\AceGUI-3.0.xml
 Libs\AceConfig-3.0\AceConfig-3.0.xml
 Libs\AceDB-3.0\AceDB-3.0.xml

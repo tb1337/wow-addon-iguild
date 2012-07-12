@@ -17,8 +17,9 @@ L["Displays both public and officer notes of your guild mates in a single column
 L["Displays the achievement points of your guild mates."] = true
 L["Displays the guild exp contributed by your guild mates. The displayed number is divided by 1000."] = true
 
-L["Feed Options"] = true
+L["Plugin Options"] = true
 L["Tooltip Options"] = true
+L["Show Progress"] = true
 
 L["Available columns"] = true
 L["By Achievement Points"] = true
@@ -48,7 +49,7 @@ L["Show Label"] = true
 L["Sorting"] = true
 L["Tradeskills"] = true
 L["Use Icon"] = true
-L["Change"] = "Change"
+L["change"] = true
 L["Enable Script"] = true
 L["If activated, clicking on the given cell will result in something special."] = true
 --@end-do-not-package@

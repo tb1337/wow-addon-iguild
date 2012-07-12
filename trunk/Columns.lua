@@ -23,6 +23,7 @@ local COLOR_MASTER  = "|cffff6644%s|r";
 local COLOR_OFFICER = "|cff40c040%s|r";
 
 local MAX_ACMPOINTS = 19540; -- see iGuild/Developer.lua
+local MAX_PROFESSION_SKILL = 600; -- Mists of Pandaria
 
 ----------------------------
 -- Sorting and Columns
@@ -218,37 +219,30 @@ iGuild.Columns = {
 		brush = function(member)
 			local label = "";
 			
-			local ts = iGuild.TradeSkills[member.name];
-			if( type(ts) ~= "table" ) then
-				return label;
-			end
-			
-			for i = 1, #ts do
-				label = label..(i == 1 and "" or " ")..("|T%s:%d:%d|t"):format("Interface\\Addons\\iGuild\\Images\\"..ts[i].texture, iconSize, iconSize);
+			for i = 1, 2 do
+				if( member["ts"..i] ) then
+					label = label..(i == 1 and "" or " ")..("|T%s:%d:%d|t"):format("Interface\\Addons\\iGuild\\Images\\"..member["ts"..i.."tex"], iconSize, iconSize);
+					if( iGuild.db.Column.tradeskills.ShowProgress ) then
+						if( iGuild.db.Column.tradeskills.Color == 2 ) then
+							label = ("%s|cff%s%s|r"):format(label, LibCrayon:GetThresholdHexColor(member["ts"..i.."prog"], MAX_PROFESSION_SKILL), member["ts"..i.."prog"]);
+						else
+							label = ("%s"..COLOR_GOLD):format(label, member["ts"..i.."prog"]);
+						end
+					end
+				end
 			end
 			
 			return label;
 		end,
 		canUse = function() return iGuild.db.Column.tradeskills.Enable end,
 		script = function(_, member, button)
-			local ts = iGuild.TradeSkills[member.name];
-			if( type(ts) ~= "table" ) then
-				return;
-			end
-			
-			if( button == "LeftButton" and #ts >= 1 and _G.CanViewGuildRecipes(ts[1].id) ) then
-				_G.GetGuildMemberRecipes(member.name, ts[1].id);
-			elseif( button == "RightButton" and #ts > 1 and _G.CanViewGuildRecipes(ts[2].id) ) then
-				_G.GetGuildMemberRecipes(member.name, ts[2].id);
+			if( button == "LeftButton" and member.ts1 and _G.CanViewGuildRecipes(member.ts1id) ) then
+				_G.GetGuildMemberRecipes(member.name, member.ts1id);
+			elseif( button == "RightButton" and member.ts2 and _G.CanViewGuildRecipes(member.ts2id) ) then
+				_G.GetGuildMemberRecipes(member.name, member.ts2id);
 			end
 		end,
-		scriptUse = function(member)
-			local ts = iGuild.TradeSkills[member.name];
-			if( type(ts) == "table" and #ts > 0 ) then
-				return 1;
-			end
-			return nil;
-		end,
+		scriptUse = function(member) return ( member.ts1 and true or false ) end,
 	},
 	class = {
 		label = _G.CLASS,
