@@ -2,19 +2,6 @@ package-as: iGuild
 enable-nolib-creation: no
 
 ignore:
-  - Libs/AceBucket-3.0
-  - Libs/AceConfig-3.0
-  - Libs/AceDB-3.0
-  - Libs/AceEvent-3.0
-  - Libs/AceGUI-3.0
-  - Libs/AceLocale-3.0
-  - Libs/AceTimer-3.0
-  - Libs/CallbackHandler-1.0
-  - Libs/LibBabble-Zone-3.0
-  - Libs/LibCrayon-3.0
-  - Libs/LibStub
-  - Libs/LibTourist-3.0
-  - Libs/iLib
   - Developer.lua
 
 externals:
@@ -46,6 +33,7 @@ externals:
     url: svn://svn.curseforge.net/wow/ilib/mainline/trunk
 
 optional-dependencies:
+  - ace3
   - ilib
   - libbabble-zone-3-0
   - libtourist-3-0
