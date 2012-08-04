@@ -455,4 +455,10 @@ function iGuild:UpdateTooltip(tip)
 			member = nil;
 		end
 	end -- end for y
+	
+	if( LibStub("iLib"):IsUpdate(AddonName) ) then
+		tip:AddSeparator();
+		line = tip:AddLine("");
+		tip:SetCell(line, 1, "|cffff0000"..L["Addon update available!"].."|r", nil, "CENTER", 0);
+	end
 end

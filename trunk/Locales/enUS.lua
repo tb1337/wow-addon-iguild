@@ -17,6 +17,8 @@ L["Displays both public and officer notes of your guild mates in a single column
 L["Displays the achievement points of your guild mates."] = true
 L["Displays the guild exp contributed by your guild mates. The displayed number is divided by 1000."] = true
 
+L["Addon update available!"] = true
+
 L["Plugin Options"] = true
 L["Tooltip Options"] = true
 L["Show Progress"] = true
