@@ -22,7 +22,7 @@ local COLOR_GOLD = "|cfffed100%s|r";
 local COLOR_MASTER  = "|cffff6644%s|r";
 local COLOR_OFFICER = "|cff40c040%s|r";
 
-local MAX_ACMPOINTS = 19465; -- see iGuild/Developer.lua
+local MAX_ACMPOINTS = 19470; -- see iGuild/Developer.lua
 local MAX_PROFESSION_SKILL = 600; -- Mists of Pandaria
 
 ----------------------------
