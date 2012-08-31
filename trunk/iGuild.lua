@@ -120,12 +120,14 @@ function iGuild:Boot()
 	end
 
 	self:GetDisplayedColumns();
-	-- the following code snippet is used once and deleted after
+	-- the following code snippet is used once after login
 	self.show_colored_columns();
 	self.show_colored_columns = nil;
 	
 	self:RegisterEvent("PLAYER_GUILD_UPDATE", "EventHandler");
 	self:EventHandler();
+	
+	self:UnregisterEvent("PLAYER_ENTERING_WORLD");
 end
 iGuild:RegisterEvent("PLAYER_ENTERING_WORLD", "Boot");
 
