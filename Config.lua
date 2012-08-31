@@ -23,6 +23,8 @@ local COLOR_GREEN= "|cff00ff00%s|r";
 ---------------------------
 
 function iGuild:CreateDB()
+	iGuild.CreateDB = nil;
+	
 	return { profile = {
 		Display = "grouped, level, class, name, zone, rank",
 		Sort = "name",
