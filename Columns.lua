@@ -122,9 +122,16 @@ iGuild.Columns = {
 				status = ("<%s>"):format(_G.DND);
 			end
 			
+			if( member.mobile ) then
+				status = "|TInterface\\ChatFrame\\UI-ChatIcon-ArmoryChat:14:14:0:0:16:16:0:16:0:16:73:177:73|t"..status;
+			end
+			
+			-- mobile icon
+			-- Interface\\ChatFrame\\UI-ChatIcon-ArmoryChat:14:14:0:0:16:16:0:16:0:16:73:177:73
+			
 			-- encolor by class color
 			if( iGuild.db.Column.name.Color == 2 ) then
-				return ("|c%s%s|r"):format(_G.RAID_CLASS_COLORS[member.CLASS].colorStr, member.name);
+				return ("|c%s%s|r"):format(_G.RAID_CLASS_COLORS[member.CLASS].colorStr, status..member.name);
 			-- no color
 			else
 				return (COLOR_GOLD):format(status..member.name);
