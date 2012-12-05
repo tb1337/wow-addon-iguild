@@ -25,6 +25,8 @@ local COLOR_OFFICER = "|cff40c040%s|r";
 local MAX_ACMPOINTS = 19800; -- see iGuild/Developer.lua
 local MAX_PROFESSION_SKILL = 600; -- Mists of Pandaria
 
+local working_member; -- set and resetted by OnEnter/OnLeave handlers
+
 ----------------------------
 -- Sorting and Columns
 -----------------------------
@@ -92,7 +94,9 @@ iGuild.Sort = {
 --   brush(v): the brush defines how content in a column-cell is displayed. v is Roster-data (see top of file)
 --   canUse(v): this OPTIONAL function checks if a column can be displayed for the user. Returns 1 or nil.
 --   script(anchor, v, button): defines the click handler of a column-cell. This is optional! v is Roster-data.
---   scriptUse(v): this OPTIONAL function will check if a click handler will be attached to the column-cell. v is Roster-data. Returns 1 or nil.
+--   scriptOnEnter(anchor, v): defines an OnEnter handler of a column-cell. This is optional! v is Roster-data.
+--   scriptOnLeave(anchor, v): defines an OnLeave handler. It must be defined in ordner to get OnEnter handlers work. v is Roster-data.
+--   scriptUse(v): this OPTIONAL function will check if a script handler will be attached to the column-cell. v is Roster-data. Returns 1 or nil.
 
 iGuild.Columns = {
 	level = {
@@ -126,9 +130,6 @@ iGuild.Columns = {
 				status = "|TInterface\\ChatFrame\\UI-ChatIcon-ArmoryChat:14:14:0:0:16:16:0:16:0:16:73:177:73|t"..status;
 			end
 			
-			-- mobile icon
-			-- Interface\\ChatFrame\\UI-ChatIcon-ArmoryChat:14:14:0:0:16:16:0:16:0:16:73:177:73
-			
 			-- encolor by class color
 			if( iGuild.db.Column.name.Color == 2 ) then
 				return ("|c%s%s|r"):format(_G.RAID_CLASS_COLORS[member.CLASS].colorStr, status..member.name);
@@ -152,10 +153,10 @@ iGuild.Columns = {
 			-- encolor by threshold
 			if( iGuild.db.Column.rank.Color == 2 ) then
 				local max_rank = _G.GuildControlGetNumRanks();
-				return ("|cff%s%s|r"):format(LibCrayon:GetThresholdHexColor(max_rank - member.grankn, max_rank -1), member.grank);
+				return ("|cff%s%s|r"):format(LibCrayon:GetThresholdHexColor(max_rank - member.grank, max_rank -1), _G.GuildControlGetRankName(member.grank));
 			-- no color
 			else
-				return (COLOR_GOLD):format(member.grank);
+				return (COLOR_GOLD):format(_G.GuildControlGetRankName(member.grank));
 			end
 		end,
 		script = function(_, member, button)
@@ -167,6 +168,16 @@ iGuild.Columns = {
 			if( _G.IsAltKeyDown() and button == "RightButton" and _G.CanGuildDemote() ) then
 				_G.GuildDemote(member.name);
 			end
+		end,
+		scriptOnEnter = function(anchor, member)
+			working_member = member;
+			local tip = iGuild:GetTooltip("Ranks", "UpdateRanksTooltip");
+			tip:SetPoint("TOPLEFT", anchor:GetParent(), "TOPRIGHT", 10, 10);
+			tip:Show();
+		end,
+		scriptOnLeave = function(anchor, member)
+			iGuild:GetTooltip("Ranks"):Release();
+			working_member = nil;
 		end,
 		scriptUse = function() return ( _G.CanGuildPromote() or _G.CanGuildDemote() ) end,
 	},
@@ -289,3 +300,21 @@ iGuild.Columns = {
 		end,
 	}
 };
+
+----------------------------
+-- UpdateRanksTooltip
+----------------------------
+
+function iGuild:UpdateRanksTooltip(tip)
+	tip:Clear();
+	tip:SetColumnLayout(1, "LEFT");
+	
+	local rankNum = _G.GuildControlGetNumRanks();
+	
+	for i = 1, rankNum do
+		tip:AddLine( 
+			("|cff%s%s|r"):format(LibCrayon:GetThresholdHexColor(rankNum - i, rankNum - 1), _G.GuildControlGetRankName(i))
+			..( i == working_member.grank and " |TInterface\\RAIDFRAME\\ReadyCheck-Ready:"..iconSize..":"..iconSize.."|t" or "")
+		);
+	end
+end

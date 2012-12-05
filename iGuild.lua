@@ -141,7 +141,8 @@ function iGuild:EventHandler()
 			Bucket = self:RegisterBucketEvent({
 				"GUILD_MOTD",
 				"GUILD_ROSTER_UPDATE",
-				"GUILD_XP_UPDATE"
+				"GUILD_XP_UPDATE",
+				"GUILD_RANKS_UPDATE"
 			}, 5, "EventHandler");
 			self:RegisterEvent("GROUP_ROSTER_UPDATE", "GroupChanged");
 			self:RegisterEvent("GUILD_TRADESKILL_UPDATE", "TradeSkillUpdate");
@@ -178,12 +179,13 @@ function iGuild:EventHandler()
 		
 		self.ldb.text = ldbText;
 		self:SetupGuildRoster();
-		self:CheckTooltips();
+		self:CheckTooltips("Main", "Ranks");
 	else -- Not in Guild!
 		if( RosterTimer ) then
 			self:UnregisterBucket(Bucket);
 			self:UnregisterEvent("GROUP_ROSTER_UPDATE");
 			self:UnregisterEvent("GUILD_TRADESKILL_UPDATE");
+			self:UnRegisterEvent("GUILD_RANKS_UPDATE");
 			
 			self:CancelTimer(RosterTimer);
 			RosterTimer = nil;
@@ -199,9 +201,9 @@ function iGuild:EventHandler()
 	end
 end
 
-----------------------
--- GroupChanged
-----------------------
+--------------------------------
+-- Little event callbacks
+--------------------------------
 
 function iGuild:GroupChanged()
 	self:GetDisplayedColumns();
@@ -227,19 +229,18 @@ do
 			elseif( k == "apoints")then return t[7]
 			elseif( k == "arank" ) then return t[8]
 			elseif( k == "grank" ) then return t[9]
-			elseif( k == "grankn") then return t[10]
-			elseif( k == "note"  ) then return t[11]
-			elseif( k == "onote" ) then return t[12]
-			elseif( k == "gxp"   ) then return t[13]
-			elseif( k == "trade" ) then return t[14]
-			elseif( k == "ts1" )   then return t[14]
-			elseif( k == "ts1prog" and t[14] ) then return iGuild.TradeSkills[t[1]][2]
-			elseif( k == "ts1id"   and t[14] ) then return TradeSkillDB[t[14]][2]
-			elseif( k == "ts1tex"  and t[14] ) then return TradeSkillDB[t[14]][3]
-			elseif( k == "ts2" )   then return t[15]
-			elseif( k == "ts2prog" and t[15] ) then return iGuild.TradeSkills[t[1]][4]
-			elseif( k == "ts2id"   and t[15] ) then return TradeSkillDB[t[15]][2]
-			elseif( k == "ts2tex"  and t[15] ) then return TradeSkillDB[t[15]][3]
+			elseif( k == "note"  ) then return t[10]
+			elseif( k == "onote" ) then return t[11]
+			elseif( k == "gxp"   ) then return t[12]
+			elseif( k == "trade" ) then return t[13]
+			elseif( k == "ts1" )   then return t[13]
+			elseif( k == "ts1prog" and t[13] ) then return iGuild.TradeSkills[t[1]][2]
+			elseif( k == "ts1id"   and t[13] ) then return TradeSkillDB[t[13]][2]
+			elseif( k == "ts1tex"  and t[13] ) then return TradeSkillDB[t[13]][3]
+			elseif( k == "ts2" )   then return t[14]
+			elseif( k == "ts2prog" and t[14] ) then return iGuild.TradeSkills[t[1]][4]
+			elseif( k == "ts2id"   and t[14] ) then return TradeSkillDB[t[14]][2]
+			elseif( k == "ts2tex"  and t[14] ) then return TradeSkillDB[t[14]][3]
 			else return nil end
 		end,
 	};
@@ -272,19 +273,18 @@ do
 					[6]  = charMobile,
 					[7]  = acmPoints,
 					[8]  = acmRank,
-					[9]  = guildRank,
-					[10] = guildRankN,
-					[11] = guildNote or "",
-					[12] = officerNote or "",
-					[13] = maxXP
+					[9]  = guildRankN + 1, -- we do not store the guild rank name anymore to save some memory. the rank number must be + 1 to work with API rank indexes
+					[10] = guildNote or "",
+					[11] = officerNote or "",
+					[12] = maxXP
 				};
 				
 				if( self.db.Column.tradeskills.Enable and self.TradeSkills[charName] ) then
 					if( #self.TradeSkills[charName] >= 2 ) then
-						self.Roster[iter][14] = self.TradeSkills[charName][1];
+						self.Roster[iter][13] = self.TradeSkills[charName][1];
 					end
 					if( #self.TradeSkills[charName] >= 4 ) then
-						self.Roster[iter][15] = self.TradeSkills[charName][3];
+						self.Roster[iter][14] = self.TradeSkills[charName][3];
 					end
 				end
 				
@@ -448,6 +448,16 @@ function iGuild:UpdateTooltip(tip)
 				
 				if( info.script and self.db.Column[name].EnableScript and info.scriptUse(member) ) then
 					tip:SetCellScript(line, x, "OnMouseDown", info.script, member);
+				end
+				
+				if( self.db.Column[name].EnableScript and info.scriptUse(member) ) then
+					if( info.script ) then
+						tip:SetCellScript(line, x, "OnMouseDown", info.script, member);
+					end
+					if( info.scriptOnEnter and info.scriptOnLeave ) then
+						tip:SetCellScript(line, x, "OnEnter", info.scriptOnEnter, member);
+						tip:SetCellScript(line, x, "OnLeave", info.scriptOnLeave, member);
+					end
 				end
 			end
 		end -- end for x
