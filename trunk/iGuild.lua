@@ -400,6 +400,13 @@ function iGuild:UpdateTooltip(tip)
 	tip:Clear();
 	tip:SetColumnLayout(#self.DisplayedColumns);
 	
+	-- check for addon updates
+	if( LibStub("iLib"):IsUpdate(AddonName) ) then
+		line = tip:AddHeader(" ");
+		tip:SetCell(line, 1, "|cffff0000"..L["Addon update available!"].."|r", nil, "CENTER", 0);
+	end
+	--------------------------
+	
 	local name, info, line, member;
 	
 	-- if MOTD is to be shown, place it first!
@@ -468,9 +475,4 @@ function iGuild:UpdateTooltip(tip)
 		end
 	end -- end for y
 	
-	if( LibStub("iLib"):IsUpdate(AddonName) ) then
-		tip:AddSeparator();
-		line = tip:AddLine("");
-		tip:SetCell(line, 1, "|cffff0000"..L["Addon update available!"].."|r", nil, "CENTER", 0);
-	end
 end
