@@ -58,9 +58,9 @@ iGuild.Sort = {
 	end,
 	-- sort by guild rank and fall back to name
 	rank = function(a, b)
-		if( a.grankn < b.grankn ) then
+		if( a.grank < b.grank ) then
 			return true;
-	elseif( a.grankn > b.grankn ) then
+	elseif( a.grank > b.grank ) then
 			return false;
 		else
 			return iGuild.Sort.name(a, b);
