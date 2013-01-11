@@ -6,6 +6,8 @@ local AddonName, iGuild = ...;
 
 local L = LibStub("AceLocale-3.0"):GetLocale(AddonName);
 
+local Dialog = LibStub("LibDialog-1.0");
+
 local _G = _G; -- I always use _G.FUNC when I call a Global. Upvalueing done here.
 local format = string.format;
 
@@ -214,7 +216,7 @@ cfg = {
 					
 					for i, v in ipairs(list) do
 						if( not iGuild.Columns[strtrim(v)] ) then
-							_G.StaticPopup_Show("IADDONS_ERROR_CFG");
+							Dialog:Spawn("iGuildFriendsColumnError");
 							return L["Invalid column name!"];
 						end
 					end
@@ -731,11 +733,11 @@ LibStub("AceConfigDialog-3.0"):AddToBlizOptions(AddonName);
 _G.SlashCmdList["IGUILD"] = iGuild.OpenOptions;
 _G["SLASH_IGUILD1"] = "/iguild";
 
-_G.StaticPopupDialogs["IADDONS_ERROR_CFG"] = {
-	preferredIndex = 3, -- apparently avoids some UI taint
+Dialog:Register("iGuildFriendsColumnError", {
 	text = L["Invalid column name!"],
-	button1 = _G.OKAY,
-	showAlert = 1,
-	timeout = 2.5,
-	hideOnEscape = true,
-};
+	hide_on_escape = true,
+	duration = 3,
+	buttons = {
+		{text = _G.OKAY},
+	},
+});
