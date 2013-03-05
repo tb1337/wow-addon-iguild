@@ -187,7 +187,7 @@ function iGuild:EventHandler()
 			self:UnregisterBucket(Bucket);
 			self:UnregisterEvent("GROUP_ROSTER_UPDATE");
 			self:UnregisterEvent("GUILD_TRADESKILL_UPDATE");
-			self:UnRegisterEvent("GUILD_RANKS_UPDATE");
+			self:UnregisterEvent("GUILD_RANKS_UPDATE");
 			
 			self:CancelTimer(RosterTimer);
 			RosterTimer = nil;
