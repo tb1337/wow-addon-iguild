@@ -263,6 +263,9 @@ do
 			charName, guildRank, guildRankN, charLevel, charClass, charZone, guildNote, 
 			officerNote, isOnline, charStatus, _, acmPoints, acmRank, charMobile = _G.GetGuildRosterInfo(i);
 			
+			-- remove realm name
+			charName = Ambiguate(charName, "guild");
+
 			_, maxXP, _, _ = _G.GetGuildRosterContribution(i);
 			
 			if( isOnline ) then
@@ -349,7 +352,7 @@ function iGuild:TradeSkillUpdate()
 	
 	local currentTradeSkill;
 	for i = 1, _G.GetNumGuildTradeSkill() do
-		local _, _, _, headerName, _, _, _, playerName, _, _, _, skillLevel, _, _ = _G.GetGuildTradeSkillInfo(i);
+		local _, _, _, headerName, _, _, _, playerName, _, _, _, _, skillLevel, _, _ = _G.GetGuildTradeSkillInfo(i);
 		
 		if( headerName ) then
 			currentTradeSkill = headerName;
