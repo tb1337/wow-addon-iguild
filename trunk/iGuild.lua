@@ -170,7 +170,7 @@ function iGuild:EventHandler()
 		
 		-- check if guildlevel is to be shown on the ldb
 		if( self.db.ShowGuildLevel ) then
-			ldbText = ("%s "..COLOR_GOLD.."%d"):format(ldbText, "| ", guildLevel);
+			-- tobi ldbText = ("%s "..COLOR_GOLD.."%d"):format(ldbText, "| ", guildLevel);
 		end
 		
 		-- check if guild XP is to be shown on the ldb
@@ -222,27 +222,28 @@ do
 	local mt = {
 		__index = function(t, k)
 			if    ( k == "name"  ) then return t[1]
-			elseif( k == "level" ) then return t[2]
-			elseif( k == "class" ) then return t[3]
-			elseif( k == "CLASS" ) then return ClassTranslate[t[3]]
-			elseif( k == "zone"  ) then return t[4]
-			elseif( k == "status") then return t[5]
-			elseif( k == "mobile") then return t[6]
-			elseif( k == "apoints")then return t[7]
-			elseif( k == "arank" ) then return t[8]
-			elseif( k == "grank" ) then return t[9]
-			elseif( k == "note"  ) then return t[10]
-			elseif( k == "onote" ) then return t[11]
-			elseif( k == "gxp"   ) then return t[12]
-			elseif( k == "trade" ) then return t[13]
-			elseif( k == "ts1" )   then return t[13]
-			elseif( k == "ts1prog" and t[13] ) then return iGuild.TradeSkills[t[1]][2]
-			elseif( k == "ts1id"   and t[13] ) then return TradeSkillDB[t[13]][2]
-			elseif( k == "ts1tex"  and t[13] ) then return TradeSkillDB[t[13]][3]
-			elseif( k == "ts2" )   then return t[14]
-			elseif( k == "ts2prog" and t[14] ) then return iGuild.TradeSkills[t[1]][4]
-			elseif( k == "ts2id"   and t[14] ) then return TradeSkillDB[t[14]][2]
-			elseif( k == "ts2tex"  and t[14] ) then return TradeSkillDB[t[14]][3]
+			elseif( k == "NAME"  ) then return t[2]
+			elseif( k == "level" ) then return t[3]
+			elseif( k == "class" ) then return t[4]
+			elseif( k == "CLASS" ) then return ClassTranslate[t[4]]
+			elseif( k == "zone"  ) then return t[5]
+			elseif( k == "status") then return t[6]
+			elseif( k == "mobile") then return t[7]
+			elseif( k == "apoints")then return t[8]
+			elseif( k == "arank" ) then return t[9]
+			elseif( k == "grank" ) then return t[10]
+			elseif( k == "note"  ) then return t[11]
+			elseif( k == "onote" ) then return t[12]
+			elseif( k == "gxp"   ) then return t[13]
+			elseif( k == "trade" ) then return t[14]
+			elseif( k == "ts1" )   then return t[14]
+			elseif( k == "ts1prog" and t[14] ) then return iGuild.TradeSkills[t[1]][2]
+			elseif( k == "ts1id"   and t[14] ) then return TradeSkillDB[t[14]][2]
+			elseif( k == "ts1tex"  and t[14] ) then return TradeSkillDB[t[14]][3]
+			elseif( k == "ts2" )   then return t[15]
+			elseif( k == "ts2prog" and t[15] ) then return iGuild.TradeSkills[t[1]][4]
+			elseif( k == "ts2id"   and t[15] ) then return TradeSkillDB[t[15]][2]
+			elseif( k == "ts2tex"  and t[15] ) then return TradeSkillDB[t[15]][3]
 			else return nil end
 		end,
 	};
@@ -256,40 +257,38 @@ do
 		
 		-- preventing Lua from declaring local values 10000x times per loop - saving memory!
 		local _, charName, guildRank, guildRankN, charLevel, charClass, charZone, guildNote,
-			officerNote, isOnline, charStatus, _, acmPoints, acmRank, charMobile;
+			officerNote, isOnline, charStatus, _, acmPoints, acmRank, charMobile, canSoR, repStanding;
 		local maxXP;
 		
 		for i = 1, total do
 			charName, guildRank, guildRankN, charLevel, charClass, charZone, guildNote, 
-			officerNote, isOnline, charStatus, _, acmPoints, acmRank, charMobile = _G.GetGuildRosterInfo(i);
-			
-			-- remove realm name
-			charName = Ambiguate(charName, "guild");
+			officerNote, isOnline, charStatus, _, acmPoints, acmRank, charMobile, canSoR, repStanding = _G.GetGuildRosterInfo(i);
 
 			_, maxXP, _, _ = _G.GetGuildRosterContribution(i);
 			
-			if( isOnline ) then
+			if( isOnline or charMobile ) then
 				self.Roster[iter] = {
-					[1]  = charName,
-					[2]  = charLevel,
-					[3]  = charClass,
-					[4]  = charZone or _G.UNKNOWN, -- actually may happen o_O
-					[5]  = charStatus,
-					[6]  = charMobile,
-					[7]  = acmPoints,
-					[8]  = acmRank,
-					[9]  = guildRankN + 1, -- we do not store the guild rank name anymore to save some memory. the rank number must be + 1 to work with API rank indexes
-					[10] = guildNote or "",
-					[11] = officerNote or "",
-					[12] = maxXP
+					[1]  = Ambiguate(charName, "guild"),
+					[2]  = charName,
+					[3]  = charLevel,
+					[4]  = charClass,
+					[5]  = charZone or _G.UNKNOWN, -- actually may happen o_O
+					[6]  = charStatus,
+					[7]  = charMobile,
+					[8]  = acmPoints,
+					[9]  = acmRank,
+					[10] = guildRankN + 1, -- we do not store the guild rank name anymore to save some memory. the rank number must be + 1 to work with API rank indexes
+					[11] = guildNote or "",
+					[12] = officerNote or "",
+					[13] = maxXP
 				};
 				
 				if( self.db.Column.tradeskills.Enable and self.TradeSkills[charName] ) then
 					if( #self.TradeSkills[charName] >= 2 ) then
-						self.Roster[iter][13] = self.TradeSkills[charName][1];
+						self.Roster[iter][14] = self.TradeSkills[charName][1];
 					end
 					if( #self.TradeSkills[charName] >= 4 ) then
-						self.Roster[iter][14] = self.TradeSkills[charName][3];
+						self.Roster[iter][15] = self.TradeSkills[charName][3];
 					end
 				end
 				
@@ -352,7 +351,8 @@ function iGuild:TradeSkillUpdate()
 	
 	local currentTradeSkill;
 	for i = 1, _G.GetNumGuildTradeSkill() do
-		local _, _, _, headerName, _, _, _, playerName, _, _, _, _, skillLevel, _, _ = _G.GetGuildTradeSkillInfo(i);
+		--                                  name,   FULLname (with realm)
+		local _, _, _, headerName, _, _, _,   _,   playerName, _, _, _, skillLevel, _, _ = _G.GetGuildTradeSkillInfo(i);
 		
 		if( headerName ) then
 			currentTradeSkill = headerName;
