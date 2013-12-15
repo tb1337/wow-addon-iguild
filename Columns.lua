@@ -255,9 +255,9 @@ iGuild.Columns = {
 		canUse = function() return iGuild.db.Column.tradeskills.Enable end,
 		script = function(_, member, button)
 			if( button == "LeftButton" and member.ts1 and _G.CanViewGuildRecipes(member.ts1id) ) then
-				_G.GetGuildMemberRecipes(member.name, member.ts1id);
+				_G.GetGuildMemberRecipes(member.NAME, member.ts1id);
 			elseif( button == "RightButton" and member.ts2 and _G.CanViewGuildRecipes(member.ts2id) ) then
-				_G.GetGuildMemberRecipes(member.name, member.ts2id);
+				_G.GetGuildMemberRecipes(member.NAME, member.ts2id);
 			end
 		end,
 		scriptUse = function(member) return ( member.ts1 and true or false ) end,
