@@ -143,7 +143,6 @@ function iGuild:EventHandler()
 			Bucket = self:RegisterBucketEvent({
 				"GUILD_MOTD",
 				"GUILD_ROSTER_UPDATE",
-				"GUILD_XP_UPDATE",
 				"GUILD_RANKS_UPDATE"
 			}, 5, "EventHandler");
 			self:RegisterEvent("GROUP_ROSTER_UPDATE", "GroupChanged");
@@ -151,32 +150,19 @@ function iGuild:EventHandler()
 			
 			-- this three functions are required to query much data from the WoW server.
 			_G.GuildRoster();
-			_G.QueryGuildXP();
 			_G.QueryGuildRecipes();
 			
 			RosterTimer = self:ScheduleRepeatingTimer(_G.GuildRoster, 45);
 		end
 		
-		local total, totalOn = _G.GetNumGuildMembers();
+		local total, _, totalOn = _G.GetNumGuildMembers();
 		local ldbText = ("%d/%d"):format(totalOn, total);
 		
-		local guildLevel, maxLevel = _G.GetGuildLevel();
 		local guildName = _G.GetGuildInfo("player");
 		
 		-- check if guildname is to be shown on the ldb
 		if( self.db.ShowGuildName and guildName ) then
 			ldbText = (COLOR_GOLD.." %s"):format(guildName, ldbText);
-		end
-		
-		-- check if guildlevel is to be shown on the ldb
-		if( self.db.ShowGuildLevel ) then
-			-- tobi ldbText = ("%s "..COLOR_GOLD.."%d"):format(ldbText, "| ", guildLevel);
-		end
-		
-		-- check if guild XP is to be shown on the ldb
-		if( self.db.ShowGuildXP ) then
-			local currXP, nextUp = _G.UnitGetGuildXP("player");
-			ldbText = ("%s (%d%%)"):format(ldbText, guildLevel < maxLevel and math.ceil(currXP / (currXP + nextUp) * 100) or 100);
 		end
 		
 		self.ldb.text = ldbText;
@@ -234,16 +220,15 @@ do
 			elseif( k == "grank" ) then return t[10]
 			elseif( k == "note"  ) then return t[11]
 			elseif( k == "onote" ) then return t[12]
-			elseif( k == "gxp"   ) then return t[13]
-			elseif( k == "trade" ) then return t[14]
-			elseif( k == "ts1" )   then return t[14]
-			elseif( k == "ts1prog" and t[14] ) then return iGuild.TradeSkills[t[1]][2]
-			elseif( k == "ts1id"   and t[14] ) then return TradeSkillDB[t[14]][2]
-			elseif( k == "ts1tex"  and t[14] ) then return TradeSkillDB[t[14]][3]
-			elseif( k == "ts2" )   then return t[15]
-			elseif( k == "ts2prog" and t[15] ) then return iGuild.TradeSkills[t[1]][4]
-			elseif( k == "ts2id"   and t[15] ) then return TradeSkillDB[t[15]][2]
-			elseif( k == "ts2tex"  and t[15] ) then return TradeSkillDB[t[15]][3]
+			elseif( k == "trade" ) then return t[13]
+			elseif( k == "ts1" )   then return t[13]
+			elseif( k == "ts1prog" and t[13] ) then return iGuild.TradeSkills[t[1]][2]
+			elseif( k == "ts1id"   and t[13] ) then return TradeSkillDB[t[13]][2]
+			elseif( k == "ts1tex"  and t[13] ) then return TradeSkillDB[t[13]][3]
+			elseif( k == "ts2" )   then return t[14]
+			elseif( k == "ts2prog" and t[14] ) then return iGuild.TradeSkills[t[1]][4]
+			elseif( k == "ts2id"   and t[14] ) then return TradeSkillDB[t[14]][2]
+			elseif( k == "ts2tex"  and t[14] ) then return TradeSkillDB[t[14]][3]
 			else return nil end
 		end,
 	};
@@ -258,13 +243,10 @@ do
 		-- preventing Lua from declaring local values 10000x times per loop - saving memory!
 		local _, charName, guildRank, guildRankN, charLevel, charClass, charZone, guildNote,
 			officerNote, isOnline, charStatus, _, acmPoints, acmRank, charMobile, canSoR, repStanding;
-		local maxXP;
 		
 		for i = 1, total do
 			charName, guildRank, guildRankN, charLevel, charClass, charZone, guildNote, 
 			officerNote, isOnline, charStatus, _, acmPoints, acmRank, charMobile, canSoR, repStanding = _G.GetGuildRosterInfo(i);
-
-			_, maxXP, _, _ = _G.GetGuildRosterContribution(i);
 			
 			if( isOnline or charMobile ) then
 				self.Roster[iter] = {
@@ -280,15 +262,14 @@ do
 					[10] = guildRankN + 1, -- we do not store the guild rank name anymore to save some memory. the rank number must be + 1 to work with API rank indexes
 					[11] = guildNote or "",
 					[12] = officerNote or "",
-					[13] = maxXP
 				};
 				
 				if( self.db.Column.tradeskills.Enable and self.TradeSkills[charName] ) then
 					if( #self.TradeSkills[charName] >= 2 ) then
-						self.Roster[iter][14] = self.TradeSkills[charName][1];
+						self.Roster[iter][13] = self.TradeSkills[charName][1];
 					end
 					if( #self.TradeSkills[charName] >= 4 ) then
-						self.Roster[iter][15] = self.TradeSkills[charName][3];
+						self.Roster[iter][14] = self.TradeSkills[charName][3];
 					end
 				end
 				
@@ -352,7 +333,7 @@ function iGuild:TradeSkillUpdate()
 	local currentTradeSkill;
 	for i = 1, _G.GetNumGuildTradeSkill() do
 		--                                  name,   FULLname (with realm)
-		local _, _, _, headerName, _, _, _,   _,   playerName, _, _, _, skillLevel, _, _ = _G.GetGuildTradeSkillInfo(i);
+		local _, _, _, headerName, _, _, _, _, playerName, _, _, _, skillLevel, _, _ = _G.GetGuildTradeSkillInfo(i);
 		
 		if( headerName ) then
 			currentTradeSkill = headerName;

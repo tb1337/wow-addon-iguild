@@ -15,7 +15,6 @@ L["Displays the public note of your guild mates."] = true
 L["Displays the officer note of your guild mates, if you can see it. The whole column is not shown otherwise."] = true
 L["Displays both public and officer notes of your guild mates in a single column."] = true
 L["Displays the achievement points of your guild mates."] = true
-L["Displays the guild exp contributed by your guild mates. The displayed number is divided by 1000."] = true
 
 L["Addon update available!"] = true
 
@@ -44,9 +43,7 @@ L["OfficerNote"] = "Officernote"
 L["Points"] = "Points"
 L["Querying tradeskills needs extra memory. This is why you explicitly have to enable that. Don't forget to reload your UI!"] = true
 L["Right"] = true
-L["Show Guild Level"] = true
 L["Show Guild Name"] = true
-L["Show Guild XP"] = true
 L["Show Label"] = true
 L["Sorting"] = true
 L["Tradeskills"] = true

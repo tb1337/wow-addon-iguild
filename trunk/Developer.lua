@@ -23,6 +23,11 @@ local AddonName, iGuild = ...;
 -- Patch 5.4.1 = 21995
 
 ----------------------------
+
+-- Warlords of Draenor
+-- Patch 6.0.2 = 24635
+
+----------------------------
 ----------------------------
 
 local achievements = {};
@@ -36,7 +41,7 @@ function iGuild:CountAchievements()
 	local catName, catParent, catUnknown, catTotal, catCompleted, achID, achName, achPoints, achComplete, _, achFlags, thisID;
 	
 	for i, v in ipairs(cats) do
-		if( v == 81 ) then -- Feets of Strength
+		if( v == 81 or v == 15234 ) then -- Feets of Strength or Classic achievements
 			table.remove(cats, i);
 		end
 	end
