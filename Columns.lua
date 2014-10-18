@@ -22,7 +22,7 @@ local COLOR_GOLD = "|cfffed100%s|r";
 local COLOR_MASTER  = "|cffff6644%s|r";
 local COLOR_OFFICER = "|cff40c040%s|r";
 
-local MAX_ACMPOINTS = 21995; -- see iGuild/Developer.lua
+local MAX_ACMPOINTS = 24635; -- see iGuild/Developer.lua
 local MAX_PROFESSION_SKILL = 600; -- Mists of Pandaria
 
 local working_member; -- set and resetted by OnEnter/OnLeave handlers
@@ -244,7 +244,7 @@ iGuild.Columns = {
 						if( iGuild.db.Column.tradeskills.Color == 2 ) then
 							label = ("%s|cff%s%s|r"):format(label, LibCrayon:GetThresholdHexColor(member["ts"..i.."prog"], MAX_PROFESSION_SKILL), member["ts"..i.."prog"]);
 						else
-							label = ("%s"..COLOR_GOLD):format(label, member["ts"..i.."prog"]);
+							label = ("%s"..COLOR_GOjLD):format(label, member["ts"..i.."prog"]);
 						end
 					end
 				end
@@ -276,14 +276,6 @@ iGuild.Columns = {
 			else
 				return (COLOR_GOLD):format(member.class);
 			end
-		end,
-	},
-	exp = {
-		label = _G.XP,
-		brush = function(member)			
-			return (COLOR_GOLD):format(
-				_G.BreakUpLargeNumbers(math.ceil(member.gxp / 1000))
-			);
 		end,
 	},
 	grouped = {

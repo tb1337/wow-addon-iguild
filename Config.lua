@@ -173,16 +173,6 @@ cfg = {
 				name = L["Show Guild Name"],
 				order = 5,
 			},
-			ShowGuildLevel = {
-				type = "toggle",
-				name = L["Show Guild Level"],
-				order = 10,
-			},
-			ShowGuildXP = {
-				type = "toggle",
-				name = L["Show Guild XP"],
-				order = 15,
-			},
 			Spacer2 = {
 				type = "description",
 				name = " ",
@@ -687,36 +677,6 @@ cfg = {
 							[2] = L["By Threshold"],
 						},
 						arg = {k = "acmpoints", v = "Color"},
-					},
-				},
-			},
-			Column_exp = {
-				type = "group",
-				name = "",
-				order = 220,
-				args = {
-					Infotext = {
-						type = "description",
-						name = L["Displays the guild exp contributed by your guild mates. The displayed number is divided by 1000."].."\n",
-						order = 1,
-						fontSize = "medium",
-					},
-					ShowLabel = {
-						type = "toggle",
-						name = L["Show Label"],
-						order = 5,
-						arg = {k = "exp", v = "ShowLabel"},
-					},
-					Justification = {
-						type = "select",
-						name = L["Justification"],
-						order = 10,
-						values = {
-							["LEFT"] = L["Left"],
-							["CENTER"] = L["Center"],
-							["RIGHT"] = L["Right"],
-						},
-						arg = {k = "exp", v = "Align"},
 					},
 				},
 			},
