@@ -222,11 +222,11 @@ do
 			elseif( k == "onote" ) then return t[12]
 			elseif( k == "trade" ) then return t[13]
 			elseif( k == "ts1" )   then return t[13]
-			elseif( k == "ts1prog" and t[13] ) then return iGuild.TradeSkills[t[1]][2]
+			elseif( k == "ts1prog" and t[13] ) then return iGuild.TradeSkills[t[2]][2]
 			elseif( k == "ts1id"   and t[13] ) then return TradeSkillDB[t[13]][2]
 			elseif( k == "ts1tex"  and t[13] ) then return TradeSkillDB[t[13]][3]
 			elseif( k == "ts2" )   then return t[14]
-			elseif( k == "ts2prog" and t[14] ) then return iGuild.TradeSkills[t[1]][4]
+			elseif( k == "ts2prog" and t[14] ) then return iGuild.TradeSkills[t[2]][4]
 			elseif( k == "ts2id"   and t[14] ) then return TradeSkillDB[t[14]][2]
 			elseif( k == "ts2tex"  and t[14] ) then return TradeSkillDB[t[14]][3]
 			else return nil end
@@ -250,7 +250,7 @@ do
 			
 			if( isOnline or charMobile ) then
 				self.Roster[iter] = {
-					[1]  = Ambiguate(charName, "guild"),
+					[1]  = Ambiguate(charName, "all"),
 					[2]  = charName,
 					[3]  = charLevel,
 					[4]  = charClass,
