@@ -32,8 +32,6 @@ function iGuild:CreateDB()
 		Sort = "name",
 		ShowGuildName = true,
 		ShowGuildMOTD = false,
-		ShowGuildLevel = false,
-		ShowGuildXP = false,
 		ShowLabels = true, -- this option can just be set by the mod itself
 		Column = {
 			level = {
@@ -86,10 +84,6 @@ function iGuild:CreateDB()
 				Align = "LEFT",
 				Icon = true,
 				Color = 2,
-			},
-			exp = {
-				ShowLabel = true,
-				Align = "LEFT",
 			},
 			grouped = {
 				ShowLabel = false,
