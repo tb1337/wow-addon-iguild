@@ -244,7 +244,7 @@ iGuild.Columns = {
 						if( iGuild.db.Column.tradeskills.Color == 2 ) then
 							label = ("%s|cff%s%s|r"):format(label, LibCrayon:GetThresholdHexColor(member["ts"..i.."prog"], MAX_PROFESSION_SKILL), member["ts"..i.."prog"]);
 						else
-							label = ("%s"..COLOR_GOjLD):format(label, member["ts"..i.."prog"]);
+							label = ("%s"..COLOR_GOLD):format(label, member["ts"..i.."prog"]);
 						end
 					end
 				end
