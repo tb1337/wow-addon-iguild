@@ -162,11 +162,11 @@ iGuild.Columns = {
 		script = function(_, member, button)
 			-- left clicks will promote, if we can promote
 			if( _G.IsAltKeyDown() and button == "LeftButton" and _G.CanGuildPromote() ) then
-				_G.GuildPromote(member.name);
+				_G.GuildPromote(member.NAME);
 			end
 			-- right clicks will demote, if we can demote
 			if( _G.IsAltKeyDown() and button == "RightButton" and _G.CanGuildDemote() ) then
-				_G.GuildDemote(member.name);
+				_G.GuildDemote(member.NAME);
 			end
 		end,
 		scriptOnEnter = function(anchor, member)
