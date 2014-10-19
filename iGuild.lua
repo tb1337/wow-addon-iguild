@@ -378,6 +378,11 @@ end
 
 local function ChangeMOTDClick(_, var, button)
 	if( button == "LeftButton" ) then
+		-- check if guild UI is loaded
+		if( not _G.GuildFrame or not _G.GuildFrame:IsVisible() ) then
+			_G.ToggleGuildFrame();
+		end
+		
 		_G.GuildTextEditFrame_Show("motd");
 	end
 end
