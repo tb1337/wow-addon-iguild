@@ -26,6 +26,7 @@ local AddonName, iGuild = ...;
 
 -- Warlords of Draenor
 -- Patch 6.0.2 = 24635
+-- Patch 6.1.0 = 24990
 
 ----------------------------
 ----------------------------
