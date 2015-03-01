@@ -166,7 +166,7 @@ iGuild.Columns = {
 			end
 			-- right clicks will demote, if we can demote
 			if( _G.IsAltKeyDown() and button == "RightButton" and _G.CanGuildDemote() ) then
-				_G.GuildDemote(member.NAME);
+				_G.GuildDemote(member.name);
 			end
 		end,
 		scriptOnEnter = function(anchor, member)
