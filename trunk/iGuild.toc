@@ -1,6 +1,6 @@
-## Interface: 60100
+## Interface: 60200
 ## Title: i|cffffffaaGuild|r
-## Version: 6.1.2
+## Version: 6.2.1
 ## Notes: The dynamic Guild Display for your LDB!
 ## Author: grdn
 ## SavedVariables: iGuildDB
