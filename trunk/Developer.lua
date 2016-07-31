@@ -29,6 +29,11 @@ local AddonName, iGuild = ...;
 -- Patch 6.1.0 = 24990
 
 ----------------------------
+
+-- Legion
+-- Patch 7.0.3 = 27590
+
+----------------------------
 ----------------------------
 
 local achievements = {};
@@ -55,32 +60,36 @@ function iGuild:CountAchievements()
 			achID, achName, achPoints, achComplete, _, _, _, _, achFlags, _, _ = _G.GetAchievementInfo(category, ach);
 			thisID = achID;
 			
-			if( not achievements[achID] ) then
-				achievements[achID] = achPoints;
-				numAchs = numAchs + 1;
-				numPoints = numPoints + achPoints;
-			end
+			if( achID ) then
 			
-			local prev = thisID;
-			while( _G.GetPreviousAchievement(prev) ) do
-				prev = _G.GetPreviousAchievement(prev);
-				if( not achievements[prev] ) then
-					achID, achName, achPoints, achComplete, _, _, _, _, achFlags, _, _ = _G.GetAchievementInfo(prev);
+				if( not achievements[achID] ) then
 					achievements[achID] = achPoints;
 					numAchs = numAchs + 1;
 					numPoints = numPoints + achPoints;
 				end
-			end
-			
-			prev = thisID;
-			while( _G.GetNextAchievement(prev) ) do
-				prev = _G.GetNextAchievement(prev);
-				if( not achievements[prev] ) then
-					achID, achName, achPoints, achComplete, _, _, _, _, achFlags, _, _ = _G.GetAchievementInfo(prev);
-					achievements[achID] = achPoints;
-					numAchs = numAchs + 1;
-					numPoints = numPoints + achPoints;
+				
+				local prev = thisID;
+				while( _G.GetPreviousAchievement(prev) ) do
+					prev = _G.GetPreviousAchievement(prev);
+					if( not achievements[prev] ) then
+						achID, achName, achPoints, achComplete, _, _, _, _, achFlags, _, _ = _G.GetAchievementInfo(prev);
+						achievements[achID] = achPoints;
+						numAchs = numAchs + 1;
+						numPoints = numPoints + achPoints;
+					end
 				end
+				
+				prev = thisID;
+				while( _G.GetNextAchievement(prev) ) do
+					prev = _G.GetNextAchievement(prev);
+					if( not achievements[prev] ) then
+						achID, achName, achPoints, achComplete, _, _, _, _, achFlags, _, _ = _G.GetAchievementInfo(prev);
+						achievements[achID] = achPoints;
+						numAchs = numAchs + 1;
+						numPoints = numPoints + achPoints;
+					end
+				end
+				
 			end
 		end
 	end
