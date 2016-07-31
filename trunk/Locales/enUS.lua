@@ -51,4 +51,6 @@ L["Use Icon"] = true
 L["change"] = true
 L["Enable Script"] = true
 L["If activated, clicking on the given cell will result in something special."] = true
+
+L["Remote Chat"] = true
 --@end-do-not-package@

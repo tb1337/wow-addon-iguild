@@ -14,6 +14,10 @@ local format = string.format;
 
 local iconSize = 14;
 
+local Mobile_Away_Icon = "\124TInterface\\ChatFrame\\UI-ChatIcon-ArmoryChat-AwayMobile:14:14:0:0:16:16:0:16:0:16\124t";
+local Mobile_Busy_Icon = "\124TInterface\\ChatFrame\\UI-ChatIcon-ArmoryChat-BusyMobile:14:14:0:0:16:16:0:16:0:16\124t";
+local Mobile_Icon = "\124TInterface\\ChatFrame\\UI-ChatIcon-ArmoryChat:14:14:0:0:16:16:0:16:0:16:73:177:73a\124t";
+
 -----------------------------------------
 -- Variables, functions and colors
 -----------------------------------------
@@ -122,12 +126,20 @@ iGuild.Columns = {
 			
 			if( member.status == 1 ) then
 				status = ("<%s>"):format(_G.AFK);
+				
+				if( member.mobile ) then
+					status = Mobile_Away_Icon;
+				end
+				
 			elseif( member.status == 2 ) then
 				status = ("<%s>"):format(_G.DND);
-			end
-			
-			if( member.mobile ) then
-				status = "|TInterface\\ChatFrame\\UI-ChatIcon-ArmoryChat:14:14:0:0:16:16:0:16:0:16:73:177:73|t"..status;
+				
+				if( member.mobile ) then
+					status = Mobile_Busy_Icon;
+				end
+				
+			elseif( member.mobile ) then
+				status = Mobile_Icon;
 			end
 			
 			-- encolor by class color

@@ -248,6 +248,10 @@ do
 			charName, guildRank, guildRankN, charLevel, charClass, charZone, guildNote, 
 			officerNote, isOnline, charStatus, _, acmPoints, acmRank, charMobile, canSoR, repStanding = _G.GetGuildRosterInfo(i);
 			
+			if charMobile then
+				charZone = L["Remote Chat"];
+			end
+			
 			if( isOnline or charMobile ) then
 				self.Roster[iter] = {
 					[1]  = Ambiguate(charName, "all"),
