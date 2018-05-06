@@ -303,6 +303,7 @@ function iGuild:TradeSkillUpdate()
 	-- no tradeskill db, so we generate it from scratch.
 	if( not TradeSkillDB ) then
 		TradeSkillDB = {};
+		_G.TSDB=TradeSkillDB;
 		
 		for i = 1, _G.GetNumGuildTradeSkill() do
 			local skillID, isCollapsed, iconTexture, headerName, _, _, _, _, _, _, _, _, _, _ = _G.GetGuildTradeSkillInfo(i);
@@ -410,7 +411,7 @@ function iGuild:UpdateTooltip(tip)
 		
 		-- at first, we add MOTD title and eventually a change button
 		line = tip:AddLine(" ");
-		tip:SetCell(line, 1, (COLOR_GOLD..(edit and " "..L["change"] or "")):format(_G.GUILD_MOTD), nil, "LEFT", 0);
+		tip:SetCell(line, 1, (COLOR_GOLD..(edit and " ["..L["change"].."]" or "")):format(_G.GUILD_MOTD), nil, "LEFT", 0);
 		
 		if( edit ) then
 			tip:SetCellScript(line, 1, "OnMouseDown", ChangeMOTDClick);

@@ -26,7 +26,7 @@ local COLOR_GOLD = "|cfffed100%s|r";
 local COLOR_MASTER  = "|cffff6644%s|r";
 local COLOR_OFFICER = "|cff40c040%s|r";
 
-local MAX_ACMPOINTS = 28990; -- see iGuild/Developer.lua
+local MAX_ACMPOINTS = 29145; -- see iGuild/Developer.lua
 local MAX_PROFESSION_SKILL = 800; -- Warlords of Draenor
 
 local working_member; -- set and resetted by OnEnter/OnLeave handlers
@@ -251,7 +251,8 @@ iGuild.Columns = {
 			
 			for i = 1, 2 do
 				if( member["ts"..i] ) then
-					label = label..(i == 1 and "" or " ")..("|T%s:%d:%d|t"):format("Interface\\Addons\\iGuild\\Images\\"..member["ts"..i.."tex"], iconSize, iconSize);
+					label = label..(i == 1 and "" or " ")..("|T%s:%d:%d|t"):format("Interface\\Addons\\iGuild\\Images\\TradeSkill\\"..member["ts"..i.."tex"], iconSize, iconSize);
+					
 					if( iGuild.db.Column.tradeskills.ShowProgress ) then
 						if( iGuild.db.Column.tradeskills.Color == 2 ) then
 							label = ("%s|cff%s%s|r"):format(label, LibCrayon:GetThresholdHexColor(member["ts"..i.."prog"], MAX_PROFESSION_SKILL), member["ts"..i.."prog"]);
