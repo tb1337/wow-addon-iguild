@@ -26,8 +26,8 @@ local COLOR_GOLD = "|cfffed100%s|r";
 local COLOR_MASTER  = "|cffff6644%s|r";
 local COLOR_OFFICER = "|cff40c040%s|r";
 
-local MAX_ACMPOINTS = 29145; -- see iGuild/Developer.lua
-local MAX_PROFESSION_SKILL = 800; -- Warlords of Draenor
+local MAX_ACMPOINTS = 30960; -- see iGuild/Developer.lua
+local MAX_PROFESSION_SKILL = 900; -- Battle for Azeroth
 
 local working_member; -- set and resetted by OnEnter/OnLeave handlers
 

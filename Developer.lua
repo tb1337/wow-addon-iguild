@@ -36,6 +36,11 @@ local AddonName, iGuild = ...;
 -- Patch 7.3.0 = 29145
 
 ----------------------------
+
+-- Battle for Azeroth
+-- Patch 8.0.1 = 30960
+
+----------------------------
 ----------------------------
 
 local achievements = {};
