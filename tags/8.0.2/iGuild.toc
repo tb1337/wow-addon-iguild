@@ -1,0 +1,9 @@
+## Interface: 80000
+## Title: i|cffffffaaGuild|r
+## Version: 8.0.2
+## Notes: The dynamic Guild Display for your LDB!
+## Author: grdn
+## SavedVariables: iGuildDB
+## OptionalDeps: Ace3, iLib, LibCrayon-3.0, LibDialog-1.0, LibTourist-3.0
+
+includes.xml
