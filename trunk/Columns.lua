@@ -37,57 +37,107 @@ local working_member; -- set and resetted by OnEnter/OnLeave handlers
 
 iGuild.Sort = {
 	-- sort by name
-	name = function(a, b)
+	name_asc = function(a, b)
 		return a.name < b.name;
 	end,
 	-- sort by level and fall back to name
-	level = function(a, b)
+	---------------------------------------------------------
+	level_asc = function(a, b)
 		if( a.level < b.level ) then
 			return true;
 		elseif( a.level > b.level ) then
 			return false;
 		else
-			return iGuild.Sort.name(a, b);
+			return iGuild.Sort.name_asc(a, b);
+		end
+	end,
+	level_desc = function(a, b)
+		if( a.level > b.level ) then
+			return true;
+		elseif( a.level < b.level ) then
+			return false;
+		else
+			return iGuild.Sort.name_asc(a, b);
 		end
 	end,
 	-- sort by class and fall back to name
-	class = function(a, b)
+	---------------------------------------------------------
+	class_asc = function(a, b)
 		if( a.class < b.class ) then
 			return true;
 		elseif( a.class > b.class ) then
 			return false;
 		else
-			return iGuild.Sort.name(a, b);
+			return iGuild.Sort.name_asc(a, b);
+		end
+	end,
+	class_desc = function(a, b)
+		if( a.class > b.class ) then
+			return true;
+		elseif( a.class < b.class ) then
+			return false;
+		else
+			return iGuild.Sort.name_asc(a, b);
 		end
 	end,
 	-- sort by guild rank and fall back to name
-	rank = function(a, b)
+	---------------------------------------------------------
+	rank_asc = function(a, b)
 		if( a.grank < b.grank ) then
 			return true;
-	elseif( a.grank > b.grank ) then
+		elseif( a.grank > b.grank ) then
 			return false;
 		else
-			return iGuild.Sort.name(a, b);
+			return iGuild.Sort.name_asc(a, b);
+		end
+	end,
+	rank_desc = function(a, b)
+		if( a.grank > b.grank ) then
+			return true;
+		elseif( a.grank < b.grank ) then
+			return false;
+		else
+			return iGuild.Sort.name_asc(a, b);
 		end
 	end,
 	-- sort by achievement points and fall back to name
-	points = function(a, b)
+	---------------------------------------------------------
+	points_asc = function(a, b)
+		if( a.apoints < b.apoints ) then
+			return true;
+		elseif( a.apoints > b.apoints ) then
+			return false;
+		else
+			return iGuild.Sort.name_asc(a, b);
+		end
+	end,
+	points_desc = function(a, b)
 		if( a.apoints > b.apoints ) then
 			return true;
 		elseif( a.apoints < b.apoints ) then
 			return false;
 		else
-			return iGuild.Sort.name(a, b);
+			return iGuild.Sort.name_asc(a, b);
 		end
 	end,
 	-- sort by zone and fall back to name
-	zone = function(a, b)
+	---------------------------------------------------------
+	zone_asc = function(a, b)
 		if( a.zone < b.zone ) then
 			return true;
 		elseif( a.zone > b.zone ) then
 			return false;
 		else
-			return iGuild.Sort.name(a, b);
+			return iGuild.Sort.name_asc(a, b);
+		end
+	end,
+	zone_desc = function(a, b)
+		if( a.zone > b.zone ) then
+			return true;
+		elseif( a.zone < b.zone ) then
+			return false;
+		else
+			return iGuild.Sort.name_asc(a, b);
 		end
 	end
 };

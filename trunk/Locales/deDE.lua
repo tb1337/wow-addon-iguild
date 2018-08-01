@@ -51,4 +51,6 @@ L["Tooltip Options"] = "Tooltip Optionen"
 L["Tradeskills"] = "Berufe"
 L["Use Icon"] = "Symbol verwenden"
 L["Remote Chat"] = "Remote Chat"
+L["ASC"] = "aufsteigend"
+L["DESC"] = "absteigend"
 --@end-do-not-package@

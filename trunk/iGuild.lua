@@ -282,6 +282,61 @@ do
 			end
 		end
 		
+		--@do-not-package@
+		--[[
+		self.Roster[iter] = {
+			[1] = Ambiguate("Dummy01-Onyxia", "all"),
+			[2] = "Dummy01-Onyxia",
+			[3] = 100,
+			[4] = "Priester",
+			[5] = "Eisenschmiede",
+			[6] = 0,
+			[7] = false,
+			[8] = 10000,
+			[9] = 3,
+			[10] = 5,
+			[11] = "test note",
+			[12] = "test officer note",
+		};
+		setmetatable(self.Roster[iter], mt);
+		iter = iter + 1;
+		
+		self.Roster[iter] = {
+			[1] = Ambiguate("Dummy02-Frostwolf", "all"),
+			[2] = "Dummy02-Frostwolf",
+			[3] = 110,
+			[4] = "Krieger",
+			[5] = "Orgrimmar",
+			[6] = 1,
+			[7] = true,
+			[8] = 15000,
+			[9] = 2,
+			[10] = 4,
+			[11] = "test note",
+			[12] = "test officer note",
+		};
+		setmetatable(self.Roster[iter], mt);
+		iter = iter + 1;
+		
+		self.Roster[iter] = {
+			[1] = Ambiguate("Dummy03-Onyxia", "all"),
+			[2] = "Dummy03-Onyxia",
+			[3] = 80,
+			[4] = "Hexenmeister",
+			[5] = "Orgrimmar",
+			[6] = 1,
+			[7] = false,
+			[8] = 7000,
+			[9] = 4,
+			[10] = 4,
+			[11] = "test note",
+			[12] = "test officer note",
+		};
+		setmetatable(self.Roster[iter], mt);
+		iter = iter + 1;
+		--]]
+		--@end-do-not-package@
+		
 		table.sort(self.Roster, self.Sort[self.db.Sort]);
 	end
 end

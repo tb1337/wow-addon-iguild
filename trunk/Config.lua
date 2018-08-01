@@ -29,7 +29,7 @@ function iGuild:CreateDB()
 	
 	return { profile = {
 		Display = "grouped, level, class, name, zone, rank",
-		Sort = "name",
+		Sort = "level_desc",
 		ShowGuildName = true,
 		ShowGuildMOTD = false,
 		ShowLabels = true, -- this option can just be set by the mod itself
@@ -101,8 +101,17 @@ local function sort_colored_columns(a, b) return a < b end
 local function show_colored_columns()
 	local cols = {};
 	
+	local configuredColumns = {};
+	if( iGuild.db and iGuild.db.Display ) then
+		configuredColumns = {strsplit(",", iGuild.db.Display)};
+		
+		for k, v in pairs(configuredColumns) do
+			configuredColumns[k] = strtrim(v);
+		end
+	end
+	
 	for k, _ in pairs(iGuild.Columns) do
-		table.insert(cols, (_G.tContains(iGuild.DisplayedColumns, k) and COLOR_GREEN or COLOR_RED):format(k) );
+		table.insert(cols, (_G.tContains(configuredColumns, k) and COLOR_GREEN or COLOR_RED):format(k) );
 	end
 	table.sort(cols, sort_colored_columns);
 	
@@ -217,19 +226,25 @@ cfg = {
 				type = "toggle",
 				name = _G.GUILD_MOTD,
 				order = 80,
-				width = "double",
+				--width = "double",
 			},
 			Sort = {
 				type = "select",
 				name = L["Sorting"],
 				order = 90,
+				width = "double",
 				values = {
-					["name"] = L["By Name"],
-					["level"] = L["By Level"],
-					["class"] = L["By Class"],
-					["rank"] = L["By Guildrank"],
-					["points"] = L["By Achievement Points"],
-					["zone"] = L["By Zone"],
+					["name_asc"] = L["By Name"].." "..L["ASC"],
+					["level_asc"] = L["By Level"].." "..L["ASC"],
+					["level_desc"] = L["By Level"].." "..L["DESC"],
+					["class_asc"] = L["By Class"].." "..L["ASC"],
+					["class_desc"] = L["By Class"].." "..L["DESC"],
+					["rank_asc"] = L["By Guildrank"].." "..L["ASC"],
+					["rank_desc"] = L["By Guildrank"].." "..L["DESC"],
+					["points_asc"] = L["By Achievement Points"].." "..L["ASC"],
+					["points_desc"] = L["By Achievement Points"].." "..L["DESC"],
+					["zone_asc"] = L["By Zone"].." "..L["ASC"],
+					["zone_desc"] = L["By Zone"].." "..L["DESC"],
 				},
 			},			
 			Spacer3 = {
