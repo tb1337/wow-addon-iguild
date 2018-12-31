@@ -39,6 +39,7 @@ local AddonName, iGuild = ...;
 
 -- Battle for Azeroth
 -- Patch 8.0.1 = 30960
+-- Patch 8.1.0 = 31495
 
 ----------------------------
 ----------------------------
