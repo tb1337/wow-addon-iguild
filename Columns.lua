@@ -7,7 +7,7 @@ local AddonName, iGuild = ...;
 local L = LibStub("AceLocale-3.0"):GetLocale(AddonName);
 
 local LibCrayon = LibStub("LibCrayon-3.0");
-local LibTourist = LibStub("LibTourist-3.0"); -- a really memory-eating lib.
+local LibTourist = LibStub("LibTouristClassic-1.0");
 
 local _G = _G; -- I always use _G.FUNC when I call a Global. Upvalueing done here.
 local format = string.format;
@@ -26,9 +26,6 @@ local COLOR_GOLD = "|cfffed100%s|r";
 local COLOR_MASTER  = "|cffff6644%s|r";
 local COLOR_OFFICER = "|cff40c040%s|r";
 
-local MAX_ACMPOINTS = 32850; -- see iGuild/Developer.lua
-local MAX_PROFESSION_SKILL = 900; -- Battle for Azeroth
-
 local working_member; -- set and resetted by OnEnter/OnLeave handlers
 
 ----------------------------
@@ -39,6 +36,29 @@ iGuild.Sort = {
 	-- sort by name
 	name_asc = function(a, b)
 		return a.name < b.name;
+	end,
+	-- special classic sort
+	---------------------------------------------------------
+	classic = function(a, b)
+		if( a.level > b.level ) then
+			return true;
+		elseif( a.level < b.level ) then 
+			return false;
+		else
+			if( a.zone < b.zone ) then
+				return true;
+			elseif( a.zone > b.zone ) then
+				return false;
+			else
+				if( a.class < b.class ) then
+					return true;
+				elseif( a.class > b.class ) then
+					return false;
+				else
+					return iGuild.Sort.name_asc(a, b);
+				end
+			end
+		end
 	end,
 	-- sort by level and fall back to name
 	---------------------------------------------------------
@@ -95,26 +115,6 @@ iGuild.Sort = {
 		if( a.grank > b.grank ) then
 			return true;
 		elseif( a.grank < b.grank ) then
-			return false;
-		else
-			return iGuild.Sort.name_asc(a, b);
-		end
-	end,
-	-- sort by achievement points and fall back to name
-	---------------------------------------------------------
-	points_asc = function(a, b)
-		if( a.apoints < b.apoints ) then
-			return true;
-		elseif( a.apoints > b.apoints ) then
-			return false;
-		else
-			return iGuild.Sort.name_asc(a, b);
-		end
-	end,
-	points_desc = function(a, b)
-		if( a.apoints > b.apoints ) then
-			return true;
-		elseif( a.apoints < b.apoints ) then
 			return false;
 		else
 			return iGuild.Sort.name_asc(a, b);
@@ -279,51 +279,6 @@ iGuild.Columns = {
 			
 			return note;
 		end,
-	},
-	acmpoints = {
-		label = L["Points"],
-		brush = function(member)
-			local displayPoints = _G.BreakUpLargeNumbers(member.apoints);
-			
-			-- encolor by threshold
-			if( iGuild.db.Column.acmpoints.Color == 2 ) then
-				return ("|cff%s%s|r"):format(LibCrayon:GetThresholdHexColor(member.apoints, MAX_ACMPOINTS), displayPoints);
-			-- no color
-			else
-				return (COLOR_GOLD):format(displayPoints);
-			end
-		end,
-	},
-	tradeskills = {
-		label = L["Tradeskills"],
-		brush = function(member)
-			local label = "";
-			
-			for i = 1, 2 do
-				if( member["ts"..i] ) then
-					label = label..(i == 1 and "" or " ")..("|T%s:%d:%d|t"):format("Interface\\Addons\\iGuild\\Images\\TradeSkill\\"..member["ts"..i.."tex"], iconSize, iconSize);
-					
-					if( iGuild.db.Column.tradeskills.ShowProgress ) then
-						if( iGuild.db.Column.tradeskills.Color == 2 ) then
-							label = ("%s|cff%s%s|r"):format(label, LibCrayon:GetThresholdHexColor(member["ts"..i.."prog"], MAX_PROFESSION_SKILL), member["ts"..i.."prog"]);
-						else
-							label = ("%s"..COLOR_GOLD):format(label, member["ts"..i.."prog"]);
-						end
-					end
-				end
-			end
-			
-			return label;
-		end,
-		canUse = function() return iGuild.db.Column.tradeskills.Enable end,
-		script = function(_, member, button)
-			if( button == "LeftButton" and member.ts1 and _G.CanViewGuildRecipes(member.ts1id) ) then
-				_G.GetGuildMemberRecipes(member.NAME, member.ts1id);
-			elseif( button == "RightButton" and member.ts2 and _G.CanViewGuildRecipes(member.ts2id) ) then
-				_G.GetGuildMemberRecipes(member.NAME, member.ts2id);
-			end
-		end,
-		scriptUse = function(member) return ( member.ts1 and true or false ) end,
 	},
 	class = {
 		label = _G.CLASS,

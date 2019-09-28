@@ -20,7 +20,7 @@
 <Include file="Libs\AceTimer-3.0\AceTimer-3.0.xml"/>
 
 <Script file="Libs\HereBeDragons\HereBeDragons-2.0.lua"/>
-<Script file="Libs\LibTourist-3.0\LibTourist-3.0.lua"/>
+<Script file="Libs\LibTouristClassic-1.0\LibTouristClassic-1.0.lua"/>
 @end-non-debug@-->
 
 
@@ -29,10 +29,6 @@
 <Script file="iGuild.lua"/>
 <Script file="Columns.lua"/>
 <Script file="Config.lua"/>
-
-<!--@do-not-package@-->
-<Script file="Developer.lua"/>
-<!--@end-do-not-package@-->
 
 
 </Ui>
