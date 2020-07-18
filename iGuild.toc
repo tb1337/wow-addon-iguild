@@ -1,6 +1,6 @@
-## Interface: 11302
+## Interface: 11305
 ## Title: i|cffffffaaGuild|r
-## Version: 1.13.0
+## Version: 1.13.4
 ## Notes: The dynamic Guild Display for your LDB!
 ## Author: grdn
 ## SavedVariables: iGuildDB
