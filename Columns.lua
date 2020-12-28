@@ -26,7 +26,7 @@ local COLOR_GOLD = "|cfffed100%s|r";
 local COLOR_MASTER  = "|cffff6644%s|r";
 local COLOR_OFFICER = "|cff40c040%s|r";
 
-local MAX_ACMPOINTS = 32850; -- see iGuild/Developer.lua
+local MAX_ACMPOINTS = 35800; -- see iGuild/Developer.lua
 local MAX_PROFESSION_SKILL = 900; -- Battle for Azeroth
 
 local working_member; -- set and resetted by OnEnter/OnLeave handlers
@@ -254,7 +254,7 @@ iGuild.Columns = {
 		brush = function(member)
 			return (COLOR_OFFICER):format(member.onote);
 		end,
-		canUse = function() return _G.CanViewOfficerNote() end,
+		canUse = function() return _G.C_GuildInfo.CanViewOfficerNote() end,
 	},
 	notecombi = {
 		label = L["Note"].."*",
@@ -265,7 +265,7 @@ iGuild.Columns = {
 			if( member.note ~= "" ) then
 				normal = 1;
 			end
-			if( _G.CanViewOfficerNote() and member.onote ~= "" ) then
+			if( _G.C_GuildInfo.CanViewOfficerNote() and member.onote ~= "" ) then
 				officer = 1;
 			end
 			

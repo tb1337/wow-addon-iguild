@@ -149,10 +149,10 @@ function iGuild:EventHandler()
 			self:RegisterEvent("GUILD_TRADESKILL_UPDATE", "TradeSkillUpdate");
 			
 			-- this three functions are required to query much data from the WoW server.
-			_G.GuildRoster();
+			_G.C_GuildInfo.GuildRoster();
 			_G.QueryGuildRecipes();
 			
-			RosterTimer = self:ScheduleRepeatingTimer(_G.GuildRoster, 45);
+			RosterTimer = self:ScheduleRepeatingTimer(_G.C_GuildInfo.GuildRoster, 45);
 		end
 		
 		local total, _, totalOn = _G.GetNumGuildMembers();
